@@ -1,44 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<!doctype html>
-<html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ShopSphere - Products</title></head>
-<body>
-<h1>ShopSphere Products</h1>
-<p>
-  <a href="${pageContext.request.contextPath}/">Home</a> |
-  <a href="${pageContext.request.contextPath}/cart">Cart</a> |
-  <a href="${pageContext.request.contextPath}/wishlist">Wishlist</a>
-</p>
-
-<c:choose>
-<c:when test="${empty products}"><p>No products available yet.</p></c:when>
-<c:otherwise>
-<c:forEach var="product" items="${products}">
-<article>
-  <h2>${product.name}</h2>
-  <p>Brand: ${product.brand}</p>
-  <p>${product.description}</p>
-  <strong>₹${product.price}</strong>
-  <p>Stock: ${product.stock}</p>
-
-  <c:if test="${product.stock > 0}">
-    <form method="post" action="${pageContext.request.contextPath}/cart" style="display:inline">
-      <input type="hidden" name="productId" value="${product.productId}">
-      <input type="number" name="quantity" value="1" min="1" max="${product.stock}" required>
-      <button type="submit">Add to Cart</button>
-    </form>
-  </c:if>
-  <c:if test="${product.stock <= 0}"><span>Out of stock</span></c:if>
-
-  <form method="post" action="${pageContext.request.contextPath}/wishlist" style="display:inline">
-    <input type="hidden" name="productId" value="${product.productId}">
-    <button type="submit">Add to Wishlist</button>
-  </form>
-  <hr>
-</article>
-</c:forEach>
-</c:otherwise>
-</c:choose>
-</body>
-</html>
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Shop — ShopSphere</title><link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app.css"></head>
+<body><nav class="nav"><div class="container nav-inner"><a class="brand" href="${pageContext.request.contextPath}/">Shop<span>Sphere</span></a><div class="navlinks"><a href="${pageContext.request.contextPath}/products">Shop</a><a href="${pageContext.request.contextPath}/cart">Cart</a><a href="${pageContext.request.contextPath}/wishlist">Wishlist</a><a href="${pageContext.request.contextPath}/orders">Orders</a></div><a class="btn secondary" href="${pageContext.request.contextPath}/">Home</a></div></nav>
+<main class="container section"><div class="section-head"><div><span class="eyebrow">STORE</span><h2>Featured products</h2><p class="muted">Find products and add them to your cart in one click.</p></div><input class="search" data-search="#productGrid" placeholder="Search products…"></div>
+<c:choose><c:when test="${empty products}"><div class="card empty"><h3>No products available</h3><p class="muted">Check back soon.</p></div></c:when><c:otherwise><div id="productGrid" class="grid"><c:forEach var="product" items="${products}"><article class="product-card" data-search-item><div class="product-image">◈</div><div class="product-body"><span class="chip">${product.brand}</span><div class="product-title">${product.name}</div><p class="muted">${product.description}</p><div class="inline"><span class="price">₹${product.price}</span><span class="chip">${product.stock} in stock</span></div><div class="product-actions"><c:if test="${product.stock > 0}"><form method="post" action="${pageContext.request.contextPath}/cart" class="inline"><input type="hidden" name="productId" value="${product.productId}"><input style="width:72px" type="number" name="quantity" value="1" min="1" max="${product.stock}" required><button type="submit">Add to cart</button></form></c:if><form method="post" action="${pageContext.request.contextPath}/wishlist"><input type="hidden" name="productId" value="${product.productId}"><button class="btn ghost" type="submit">♡ Wishlist</button></form></div></div></article></c:forEach></div></c:otherwise></c:choose></main><script src="${pageContext.request.contextPath}/assets/js/app.js"></script></body></html>
