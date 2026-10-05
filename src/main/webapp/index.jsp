@@ -1,20 +1,6 @@
+<!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="com.shopsphere.model.User" %>
-<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ShopSphere</title></head>
-<body>
-<h1>ShopSphere</h1>
-<p>RTU Advanced Java E-Commerce Project</p>
-<%
-User loggedInUser=(User)session.getAttribute("loggedInUser");
-if(loggedInUser==null){
-%>
-<p><a href="${pageContext.request.contextPath}/login">Login</a> | <a href="${pageContext.request.contextPath}/register">Register</a></p>
-<% } else { %>
-<p>Welcome, <strong><%= loggedInUser.getName() %></strong></p>
-<p><a href="${pageContext.request.contextPath}/logout">Logout</a></p>
-<% } %>
-<p><a href="${pageContext.request.contextPath}/products">Browse Products</a></p>
-</body>
-</html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ShopSphere — Modern E-Commerce</title><link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app.css"></head>
+<body><nav class="nav"><div class="container nav-inner"><a class="brand" href="${pageContext.request.contextPath}/">Shop<span>Sphere</span></a><div class="navlinks"><a href="${pageContext.request.contextPath}/products">Shop</a><a href="${pageContext.request.contextPath}/cart">Cart</a><a href="${pageContext.request.contextPath}/wishlist">Wishlist</a><a href="${pageContext.request.contextPath}/orders">Orders</a></div><% User u=(User)session.getAttribute("loggedInUser"); if(u==null){ %><a class="btn secondary" href="${pageContext.request.contextPath}/login">Login</a><% } else { %><span class="chip">Hi, <%=u.getName()%></span><a class="btn ghost" href="${pageContext.request.contextPath}/logout">Logout</a><% } %></div></nav>
+<main class="container hero"><div class="hero-grid"><section><span class="eyebrow">ADVANCED JAVA • SHOPSPHERE</span><h1>Commerce built like a real product.</h1><p>Modern responsive storefront powered by Java Servlets, JSP, Services, DAOs and MySQL.</p><div class="hero-actions"><a class="btn" href="${pageContext.request.contextPath}/products">Explore Products →</a><% if(u==null){ %><a class="btn secondary" href="${pageContext.request.contextPath}/register">Create Account</a><% } %></div></section><aside class="hero-card"><div class="chip" style="background:rgba(255,255,255,.14);color:#fff">LIVE LOCAL STORE</div><p style="color:#cbd5e1">End-to-end Java e-commerce flow</p><div class="metric">Java + MySQL</div><p>Auth • Cart • Wishlist • Checkout • Orders • Admin</p></aside></div></main><footer class="footer"><div class="container">© ShopSphere • RTU Advanced Java Project</div></footer><script src="${pageContext.request.contextPath}/assets/js/app.js"></script></body></html>
