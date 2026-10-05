@@ -26,7 +26,7 @@ public class CouponDAO {
         try(Connection c=DBConnection.getConnection();PreparedStatement s=c.prepareStatement(q)){
             s.setString(1,x.getCode());s.setString(2,x.getDiscountType());s.setDouble(3,x.getDiscountValue());s.setDouble(4,x.getMinimumOrder());
             if(x.getMaximumDiscount()==null)s.setNull(5,Types.DECIMAL);else s.setDouble(5,x.getMaximumDiscount());
-            if(x.getExpiryDate()==null)s.setNull(6,Types.DATE);else s.setDate(6,Date.valueOf(x.getExpiryDate()));
+            if(x.getExpiryDate()==null)s.setNull(6,Types.DATE);else s.setDate(6,java.sql.Date.valueOf(x.getExpiryDate()));
             s.executeUpdate();
         }
     }
@@ -39,6 +39,6 @@ public class CouponDAO {
         Coupon x=new Coupon();x.setCouponId(r.getInt("coupon_id"));x.setCode(r.getString("code"));x.setDiscountType(r.getString("discount_type"));
         x.setDiscountValue(r.getDouble("discount_value"));x.setMinimumOrder(r.getDouble("minimum_order"));
         double m=r.getDouble("maximum_discount");x.setMaximumDiscount(r.wasNull()?null:m);
-        Date d=r.getDate("expiry_date");x.setExpiryDate(d==null?null:d.toLocalDate());x.setStatus(r.getBoolean("status"));return x;
+        java.sql.Date d=r.getDate("expiry_date");x.setExpiryDate(d==null?null:d.toLocalDate());x.setStatus(r.getBoolean("status"));return x;
     }
 }
