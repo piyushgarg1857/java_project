@@ -3,27 +3,38 @@ package com.shopsphere.dao;
 import com.shopsphere.config.DBConnection;
 import com.shopsphere.model.Product;
 import java.sql.*;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 
 public class ProductAdminDAO {
+    private static final String SELECT = "SELECT product_id,category_id,name,brand,description,price,discount,stock,image_url,status FROM products ORDER BY product_id DESC";
+
+    public List<Product> findAll() throws SQLException {
+        List<Product> out = new ArrayList<>();
+        try (Connection c=DBConnection.getConnection(); PreparedStatement s=c.prepareStatement(SELECT); ResultSet r=s.executeQuery()) {
+            while(r.next()) out.add(map(r));
+        }
+        return out;
+    }
+
+    public Product findById(int id) throws SQLException {
+        try(Connection c=DBConnection.getConnection(); PreparedStatement s=c.prepareStatement(SELECT+" WHERE product_id=?")) {
+            s.setInt(1,id);
+            try(ResultSet r=s.executeQuery()){ return r.next()?map(r):null; }
+        }
+    }
+
     public int create(Product p) throws SQLException {
         String sql="INSERT INTO products(category_id,name,brand,description,price,discount,stock,image_url,status) VALUES(?,?,?,?,?,?,?,?,TRUE)";
         try(Connection c=DBConnection.getConnection(); PreparedStatement s=c.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)){
-            s.setInt(1,p.getCategoryId()); s.setString(2,p.getName()); s.setString(3,p.getBrand());
-            s.setString(4,p.getDescription()); s.setDouble(5,p.getPrice()); s.setDouble(6,p.getDiscount());
-            s.setInt(7,p.getStock()); s.setString(8,p.getImageUrl()); s.executeUpdate();
-            try(ResultSet rs=s.getGeneratedKeys()){ return rs.next()?rs.getInt(1):0; }
+            bind(s,p); s.executeUpdate();
+            try(ResultSet r=s.getGeneratedKeys()){return r.next()?r.getInt(1):0;}
         }
     }
 
     public boolean update(Product p) throws SQLException {
         String sql="UPDATE products SET category_id=?,name=?,brand=?,description=?,price=?,discount=?,stock=?,image_url=? WHERE product_id=?";
         try(Connection c=DBConnection.getConnection(); PreparedStatement s=c.prepareStatement(sql)){
-            s.setInt(1,p.getCategoryId()); s.setString(2,p.getName()); s.setString(3,p.getBrand());
-            s.setString(4,p.getDescription()); s.setDouble(5,p.getPrice()); s.setDouble(6,p.getDiscount());
-            s.setInt(7,p.getStock()); s.setString(8,p.getImageUrl()); s.setInt(9,p.getProductId());
-            return s.executeUpdate()==1;
+            bind(s,p); s.setInt(9,p.getProductId()); return s.executeUpdate()==1;
         }
     }
 
@@ -31,5 +42,19 @@ public class ProductAdminDAO {
         try(Connection c=DBConnection.getConnection(); PreparedStatement s=c.prepareStatement("UPDATE products SET status=FALSE WHERE product_id=?")){
             s.setInt(1,id); return s.executeUpdate()==1;
         }
+    }
+
+    private void bind(PreparedStatement s, Product p) throws SQLException {
+        s.setInt(1,p.getCategoryId()); s.setString(2,p.getName()); s.setString(3,p.getBrand());
+        s.setString(4,p.getDescription()); s.setDouble(5,p.getPrice()); s.setDouble(6,p.getDiscount());
+        s.setInt(7,p.getStock()); s.setString(8,p.getImageUrl());
+    }
+
+    private Product map(ResultSet r) throws SQLException {
+        Product p=new Product();
+        p.setProductId(r.getInt("product_id")); p.setCategoryId(r.getInt("category_id"));
+        p.setName(r.getString("name")); p.setBrand(r.getString("brand")); p.setDescription(r.getString("description"));
+        p.setPrice(r.getDouble("price")); p.setDiscount(r.getDouble("discount")); p.setStock(r.getInt("stock"));
+        p.setImageUrl(r.getString("image_url")); p.setStatus(r.getBoolean("status")); return p;
     }
 }
