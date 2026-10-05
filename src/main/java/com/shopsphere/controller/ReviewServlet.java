@@ -1,0 +1,4 @@
+package com.shopsphere.controller;
+import com.shopsphere.dao.ReviewDAO; import com.shopsphere.model.User; import jakarta.servlet.annotation.WebServlet; import jakarta.servlet.http.*; import java.io.*;
+@WebServlet("/reviews") public class ReviewServlet extends HttpServlet{private final ReviewDAO dao=new ReviewDAO();
+ protected void doPost(HttpServletRequest r,HttpServletResponse p)throws IOException{try{User u=(User)r.getSession().getAttribute("loggedInUser");dao.add(u.getUserId(),Integer.parseInt(r.getParameter("productId")),Integer.parseInt(r.getParameter("rating")),r.getParameter("reviewText"));p.sendRedirect(r.getContextPath()+"/products");}catch(Exception e){throw new IOException(e);}}}
