@@ -1,0 +1,3 @@
+package com.shopsphere.controller;
+import com.shopsphere.dao.OrderHistoryDAO; import com.shopsphere.model.User; import jakarta.servlet.*; import jakarta.servlet.annotation.WebServlet; import jakarta.servlet.http.*; import java.io.*;
+@WebServlet("/orders") public class OrdersServlet extends HttpServlet{private final OrderHistoryDAO dao=new OrderHistoryDAO();protected void doGet(HttpServletRequest r,HttpServletResponse p)throws ServletException,IOException{try{User u=(User)r.getSession().getAttribute("loggedInUser");r.setAttribute("orders",dao.findByUser(u.getUserId()));r.getRequestDispatcher("/WEB-INF/views/orders.jsp").forward(r,p);}catch(Exception e){throw new ServletException(e);}}}
