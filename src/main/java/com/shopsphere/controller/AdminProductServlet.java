@@ -1,32 +1,7 @@
 package com.shopsphere.controller;
-
-import com.shopsphere.model.Product;
-import com.shopsphere.service.CatalogAdminService;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
-import java.io.IOException;
-
-@WebServlet("/admin/products")
-public class AdminProductServlet extends HttpServlet {
-    private final CatalogAdminService service=new CatalogAdminService();
-
-    @Override protected void doPost(HttpServletRequest req,HttpServletResponse resp) throws IOException {
-        try {
-            Product p=new Product();
-            p.setCategoryId(Integer.parseInt(req.getParameter("categoryId")));
-            p.setName(req.getParameter("name")); p.setBrand(req.getParameter("brand"));
-            p.setDescription(req.getParameter("description"));
-            p.setPrice(Double.parseDouble(req.getParameter("price")));
-            p.setDiscount(Double.parseDouble(req.getParameter("discount")));
-            p.setStock(Integer.parseInt(req.getParameter("stock")));
-            p.setImageUrl(req.getParameter("imageUrl"));
-            String action=req.getParameter("action");
-            if("update".equals(action)) {
-                p.setProductId(Integer.parseInt(req.getParameter("productId")));
-                service.updateProduct(p);
-            } else service.createProduct(p);
-            resp.sendRedirect(req.getContextPath()+"/products");
-        } catch(Exception e){ throw new IOException("Product operation failed",e); }
-    }
+import com.shopsphere.model.Product; import com.shopsphere.service.CatalogAdminService; import jakarta.servlet.*; import jakarta.servlet.annotation.WebServlet; import jakarta.servlet.http.*; import java.io.*;
+@WebServlet("/admin/products") public class AdminProductServlet extends HttpServlet{
+ private final CatalogAdminService service=new CatalogAdminService();
+ protected void doGet(HttpServletRequest r,HttpServletResponse p)throws ServletException,IOException{try{r.setAttribute("categories",service.categories());r.getRequestDispatcher("/WEB-INF/views/admin/products.jsp").forward(r,p);}catch(Exception e){throw new ServletException(e);}}
+ protected void doPost(HttpServletRequest r,HttpServletResponse p)throws IOException{try{Product x=new Product();x.setCategoryId(Integer.parseInt(r.getParameter("categoryId")));x.setName(r.getParameter("name"));x.setBrand(r.getParameter("brand"));x.setDescription(r.getParameter("description"));x.setPrice(Double.parseDouble(r.getParameter("price")));x.setDiscount(Double.parseDouble(r.getParameter("discount")));x.setStock(Integer.parseInt(r.getParameter("stock")));x.setImageUrl(r.getParameter("imageUrl"));if("update".equals(r.getParameter("action"))){x.setProductId(Integer.parseInt(r.getParameter("productId")));service.updateProduct(x);}else service.createProduct(x);p.sendRedirect(r.getContextPath()+"/admin/products");}catch(Exception e){throw new IOException("Product operation failed",e);}}
 }
