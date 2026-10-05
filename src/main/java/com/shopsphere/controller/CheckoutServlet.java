@@ -2,6 +2,7 @@ package com.shopsphere.controller;
 
 import com.shopsphere.model.Coupon;
 import com.shopsphere.model.User;
+import com.shopsphere.security.InputValidator;
 import com.shopsphere.service.OrderService;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebServlet;
@@ -45,9 +46,13 @@ public class CheckoutServlet extends HttpServlet {
                 p.sendRedirect(r.getContextPath()+"/checkout");
                 return;
             }
+            String address=InputValidator.maxLength(InputValidator.required(r.getParameter("addressLine"),"Address"),"Address",255);
+            String city=InputValidator.maxLength(InputValidator.required(r.getParameter("city"),"City"),"City",100);
+            String state=InputValidator.maxLength(InputValidator.required(r.getParameter("state"),"State"),"State",100);
+            String pincode=InputValidator.pincode(r.getParameter("pincode"));
             Coupon c=(Coupon)session.getAttribute("checkoutCoupon");
             String code=c==null?null:c.getCode();
-            int id=service.placeOrder(u.getUserId(),r.getParameter("addressLine"),r.getParameter("city"),r.getParameter("state"),r.getParameter("pincode"),code);
+            int id=service.placeOrder(u.getUserId(),address,city,state,pincode,code);
             session.removeAttribute("checkoutCoupon");
             session.setAttribute("checkoutMessage",null);
             r.setAttribute("orderId",id);
