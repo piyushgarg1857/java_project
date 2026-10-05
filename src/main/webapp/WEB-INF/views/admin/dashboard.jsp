@@ -1,0 +1,1 @@
+<%@ page contentType="text/html;charset=UTF-8" %><!doctype html><html><body><h1>ShopSphere Admin Dashboard</h1><ul><li><a href="${pageContext.request.contextPath}/admin/categories">Manage Categories</a></li><li><a href="${pageContext.request.contextPath}/products">View Store</a></li><li><a href="${pageContext.request.contextPath}/logout">Logout</a></li></ul></body></html>
