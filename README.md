@@ -59,6 +59,15 @@ Advanced modules live alongside the core web application:
 - Order success flow
 - Reviews
 
+### Phase 6 — Commerce Hardening
+- Coupon management for administrators
+- Percentage/fixed coupon rules with minimum-order and maximum-discount controls
+- Coupon-aware checkout with persisted order discount and coupon usage
+- Admin enable/disable controls for promotional codes
+- Checkout validation and improved user feedback
+- Coupon rule unit tests
+- Maven compiler release pinned to Java 17 for reproducible builds
+
 ### Phase 5 — Advanced Java
 - Socket server/client
 - Java RMI server/client
@@ -97,4 +106,4 @@ Run the Java main classes directly from the IDE:
 - `com.shopsphere.i18n.I18nDemo`
 
 ## Important educational note
-The repository contains the complete project skeleton and working implementations for the requested phases, but payment gateway integration, production password hashing, connection pooling, comprehensive validation, automated tests, and production deployment hardening are separate production-grade improvements rather than claims of a live payment system.
+The repository contains working educational implementations for the requested phases. The current checkout records Cash on Delivery/local payment state; it is not a live payment gateway. Production deployment still needs items such as connection pooling, CSRF protection, centralized error pages, deployment-specific JNDI configuration, and further automated integration testing.
