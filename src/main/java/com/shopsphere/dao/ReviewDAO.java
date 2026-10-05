@@ -1,0 +1,3 @@
+package com.shopsphere.dao;
+import com.shopsphere.config.DBConnection; import java.sql.*;
+public class ReviewDAO{public void add(int u,int p,int rating,String text)throws SQLException{try(Connection c=DBConnection.getConnection();PreparedStatement s=c.prepareStatement("INSERT INTO reviews(user_id,product_id,rating,review_text) VALUES(?,?,?,?)")){s.setInt(1,u);s.setInt(2,p);s.setInt(3,rating);s.setString(4,text);s.executeUpdate();}}}
