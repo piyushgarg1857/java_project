@@ -1,6 +1,7 @@
 package com.shopsphere.controller;
 
 import com.shopsphere.model.User;
+import com.shopsphere.security.InputValidator;
 import com.shopsphere.service.AuthService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -19,7 +20,9 @@ public class LoginServlet extends HttpServlet {
     @Override protected void doPost(HttpServletRequest req,HttpServletResponse resp)
             throws ServletException,IOException {
         try {
-            User user=authService.login(req.getParameter("email"),req.getParameter("password"));
+            String email=InputValidator.email(req.getParameter("email"));
+            String password=InputValidator.required(req.getParameter("password"),"Password");
+            User user=authService.login(email,password);
             if(user==null) {
                 req.setAttribute("error","Invalid email or password.");
                 req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req,resp);
@@ -27,6 +30,9 @@ public class LoginServlet extends HttpServlet {
             }
             req.getSession(true).setAttribute("loggedInUser",user);
             resp.sendRedirect(req.getContextPath()+"/products");
+        } catch(IllegalArgumentException e) {
+            req.setAttribute("error",e.getMessage());
+            req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req,resp);
         } catch(Exception e) {
             throw new ServletException("Login failed",e);
         }
