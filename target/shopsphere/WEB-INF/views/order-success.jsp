@@ -1,0 +1,1 @@
+<%@ page contentType="text/html;charset=UTF-8" %><!doctype html><html><body><h1>Order Placed</h1><p>Your order ID is <strong>${orderId}</strong>.</p><a href="${pageContext.request.contextPath}/products">Continue shopping</a></body></html>
