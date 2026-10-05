@@ -13,6 +13,8 @@ public class CatalogAdminService {
     public List<String[]> categories() throws SQLException { return categoryDAO.findAll(); }
     public int createCategory(String name,String description) throws SQLException { return categoryDAO.create(name,description); }
     public boolean deleteCategory(int id) throws SQLException { return categoryDAO.delete(id); }
+    public List<Product> products() throws SQLException { return productDAO.findAll(); }
+    public Product findProduct(int id) throws SQLException { return productDAO.findById(id); }
     public int createProduct(Product p) throws SQLException { return productDAO.create(p); }
     public boolean updateProduct(Product p) throws SQLException { return productDAO.update(p); }
     public boolean deleteProduct(int id) throws SQLException { return productDAO.delete(id); }
