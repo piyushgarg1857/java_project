@@ -1,5 +1,6 @@
 package com.shopsphere.controller;
 
+import com.shopsphere.security.InputValidator;
 import com.shopsphere.service.AuthService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -18,14 +19,21 @@ public class RegisterServlet extends HttpServlet {
     @Override protected void doPost(HttpServletRequest req,HttpServletResponse resp)
             throws ServletException,IOException {
         try {
-            boolean created=authService.register(req.getParameter("name"),req.getParameter("email"),
-                    req.getParameter("password"),req.getParameter("mobile"));
+            String name=InputValidator.maxLength(InputValidator.required(req.getParameter("name"),"Name"),"Name",100);
+            String email=InputValidator.email(req.getParameter("email"));
+            String password=InputValidator.required(req.getParameter("password"),"Password");
+            if(password.length()<6) throw new IllegalArgumentException("Password must contain at least 6 characters.");
+            String mobile=InputValidator.mobile(req.getParameter("mobile"));
+            boolean created=authService.register(name,email,password,mobile);
             if(!created) {
                 req.setAttribute("error","Registration failed. Check details or email may already exist.");
                 req.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(req,resp);
                 return;
             }
             resp.sendRedirect(req.getContextPath()+"/login?registered=true");
+        } catch(IllegalArgumentException e) {
+            req.setAttribute("error",e.getMessage());
+            req.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(req,resp);
         } catch(Exception e) {
             throw new ServletException("Registration failed",e);
         }
