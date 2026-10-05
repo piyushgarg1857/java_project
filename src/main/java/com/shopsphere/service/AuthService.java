@@ -1,30 +1,7 @@
 package com.shopsphere.service;
-
-import com.shopsphere.dao.UserDAO;
-import com.shopsphere.model.User;
-import java.sql.SQLException;
-
-public class AuthService {
-    private final UserDAO userDAO = new UserDAO();
-
-    public boolean register(String name, String email, String password, String mobile) throws SQLException {
-        if(name==null || name.isBlank() || email==null || email.isBlank() ||
-           password==null || password.length()<6) return false;
-        if(userDAO.findByEmail(email.trim())!=null) return false;
-
-        User user=new User();
-        user.setName(name.trim());
-        user.setEmail(email.trim().toLowerCase());
-        user.setPassword(password);
-        user.setMobile(mobile);
-        return userDAO.create(user);
-    }
-
-    public User login(String email, String password) throws SQLException {
-        if(email==null || password==null) return null;
-        User user=userDAO.findByEmail(email.trim().toLowerCase());
-        if(user==null || !user.getPassword().equals(password)) return null;
-        user.setPassword(null);
-        return user;
-    }
+import com.shopsphere.dao.UserDAO; import com.shopsphere.model.User; import com.shopsphere.util.PasswordUtil; import java.sql.SQLException;
+public class AuthService{
+ private final UserDAO dao=new UserDAO();
+ public boolean register(String n,String e,String p,String m)throws SQLException{if(n==null||n.isBlank()||e==null||e.isBlank()||p==null||p.length()<6)return false;e=e.trim().toLowerCase();if(dao.findByEmail(e)!=null)return false;User u=new User();u.setName(n.trim());u.setEmail(e);u.setPassword(PasswordUtil.hash(p));u.setMobile(m);return dao.create(u);}
+ public User login(String e,String p)throws SQLException{if(e==null||p==null)return null;User u=dao.findByEmail(e.trim().toLowerCase());if(u==null||!PasswordUtil.verify(p,u.getPassword()))return null;if(!u.getPassword().startsWith("PBKDF2$"))dao.updatePassword(u.getUserId(),PasswordUtil.hash(p));u.setPassword(null);return u;}
 }
