@@ -1,5 +1,4 @@
 package com.shopsphere.security;
-import jakarta.servlet.http.HttpSession;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 public final class LoginRateLimiter{
