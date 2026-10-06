@@ -9,5 +9,8 @@ public class AdminExportServlet extends HttpServlet {
    while(r.next()){out.printf("%d,%s,%s,%s,%s%n",r.getInt(1),csv(r.getString(2)),r.getBigDecimal(3),csv(r.getString(4)),r.getTimestamp(5));}
   }catch(Exception e){throw new IOException("Unable to export orders",e);}
  }
- private String csv(String v){return """+(v==null?"":v.replace(""",""""))+""";}
+ private String csv(String v){
+  String value=v==null?"":v;
+  return "\\\""+value.replace("\\\"","\\\"\\\"")+"\\\"";
+ }
 }
