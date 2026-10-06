@@ -1,109 +1,108 @@
 # ShopSphere — RTU Advanced Java E-Commerce Project
 
-ShopSphere is an educational Java e-commerce capstone aligned with the RTU Advanced Java project guide. It combines a Java web application with the guide's advanced Java modules.
+ShopSphere is an educational Java e-commerce capstone aligned with the RTU Advanced Java project guide. The core application is a layered Jakarta Servlet/JSP web store, with focused Swing, networking, RMI, serialization, JNDI and internationalization modules for syllabus demonstration.
 
 ## Technology
-- Java 17+
-- Jakarta Servlet + JSP
+- Java 17 target
+- Jakarta Servlet 6.1 + JSP/JSTL
 - JDBC + MySQL
-- Maven + WAR
-- Apache Tomcat
+- Maven WAR + Apache Tomcat 11
 - Java Swing
 - java.net Socket/ServerSocket
-- Java RMI
+- Java RMI + RMI Registry
 - JNDI
-- Serialization
-- Servlet Filters + Listeners
-- Cookies + basic internationalization
+- Object serialization
+- Servlet filters/listeners
+- Cookies, EL, JSTL and internationalization
 
 ## Architecture
-Browser → JSP → Servlet → Service → DAO → JDBC → MySQL
+Browser → JSP/HTML/JS → Servlet → Service → DAO → JDBC → MySQL
 
-Advanced modules live alongside the core web application:
-- Networking: `com.shopsphere.network`
-- RMI: `com.shopsphere.rmi`
-- Serialization: `com.shopsphere.serialization`
-- Swing: `com.shopsphere.desktop`
-- JNDI: `com.shopsphere.jndi`
-- Web infrastructure: `com.shopsphere.web`
-- Internationalization: `com.shopsphere.i18n`
+Advanced modules remain separate from the main shopping workflow:
+- Networking: com.shopsphere.network
+- RMI: com.shopsphere.rmi
+- Serialization: com.shopsphere.serialization
+- Swing: com.shopsphere.desktop
+- JNDI: com.shopsphere.jndi
+- Web infrastructure: com.shopsphere.web
 
-## Implemented phases
+## Core functionality
+Customer:
+- Registration, login/logout and profile
+- Product listing, search, sorting and pagination
+- Product details, reviews and ratings
+- Cart and wishlist
+- Saved addresses
+- Coupons and checkout
+- Local/mock payment recording
+- Order history and customer-owned order details
 
-### Phase 1 — Foundation
-- Maven WAR project
-- MySQL schema
-- JDBC connection
-- Product model/DAO/service
-- Product listing
+Admin:
+- Dashboard
+- Product/category/inventory management
+- Customer management with account safety rules
+- Order management
+- Review moderation
+- Sales analytics
+- Coupon management
+- Order CSV export
 
-### Phase 2 — Authentication
-- User model
-- Registration/login/logout
-- HTTP session
-- Authentication filter
-- Admin role protection
+## Security and hardening
+- PBKDF2 password hashing and password policy
+- PreparedStatement-based JDBC
+- Server-side input validation
+- CSRF same-origin protection
+- Security headers and CSP
+- Authentication/Admin filters
+- Session timeout and cookie-only tracking
+- No-store responses for session-backed requests
+- Login attempt throttling
+- Customer/admin ownership checks
+- DB-backed health endpoint
+- Correlation/request logging
 
-### Phase 3 — Catalog Administration
-- Category DAO/service
-- Product create/update
-- Category create/disable
-- Admin-only routes
+## RTU syllabus demonstrations
+- ServletConfig / ServletContext: /syllabus/config-context
+- JSP declarations/scriptlets/expressions: /syllabus/demo/jsp
+- JSP fragments and tag files: /syllabus/demo/components
+- JSTL Core: /syllabus/demo/components
+- JSTL XML: /syllabus/demo/xml
+- JSTL SQL: /syllabus/demo/sql
+- Socket commands: GET_PRODUCT, GET_STOCK, SEARCH_PRODUCT
+- RMI inventory service and registry
+- Serialization
+- Swing MVC
+- URL/URLConnection
+- Locale + ResourceBundle: /language?lang=en or /language?lang=hi
+- JNDI DataSource lookup
+- Applet topic documented as a historical concept, matching the guide
 
-### Phase 4 — Shopping
-- Cart add/remove/clear
-- Wishlist add/remove
-- Checkout
-- Address creation
-- Order transaction
-- Order success flow
-- Reviews
-
-### Phase 6 — Commerce Hardening
-- Coupon management for administrators
-- Percentage/fixed coupon rules with minimum-order and maximum-discount controls
-- Coupon-aware checkout with persisted order discount and coupon usage
-- Admin enable/disable controls for promotional codes
-- Checkout validation and improved user feedback
-- Coupon rule unit tests
-- Maven compiler release pinned to Java 17 for reproducible builds
-
-### Phase 5 — Advanced Java
-- Socket server/client
-- Java RMI server/client
-- Serializable message demo
-- Swing desktop admin starter
-- JNDI DataSource lookup example
-- ServletContext listener
-- Request logging filter
-- Cookie preference example
-- English/Hindi resource bundles
+## Documentation
+- PHASES-6.md, PHASES-8-10.md, PHASES-11-15.md, PHASES-16-20.md, PHASES-21-25.md
+- PHASES-26-45.md
+- PHASES-46-60.md
+- RTU-MAPPING.md
+- ARCHITECTURE.md
+- FINAL-REPORT.md
+- VIVA-CHECKLIST.md
+- APPLET-HISTORY.md
 
 ## Database
-Run:
-`database/shopsphere.sql`
+Import:
+- database/shopsphere.sql
+- database/seed.sql
 
-Then configure the JDBC credentials in:
-`src/main/java/com/shopsphere/config/DBConnection.java`
+For deployment, configure the Tomcat jdbc/ShopSphereDB JNDI datasource. DBConnection also supports SHOPSPHERE_DB_URL, SHOPSPHERE_DB_USER and SHOPSPHERE_DB_PASSWORD environment variables.
 
-The current educational default is localhost MySQL with user `root` and password `root`. For a real deployment, move credentials to environment variables or Tomcat JNDI.
-
-## Build
+## Build and test
 ```bash
-mvn clean package
+mvn clean test package
 ```
 
-Deploy the generated `target/shopsphere.war` to Tomcat.
+The GitHub Actions workflow runs the same Maven verification command.
 
-## Advanced module examples
-Run the Java main classes directly from the IDE:
-- `com.shopsphere.network.ShopSocketServer`
-- `com.shopsphere.network.ShopSocketClient`
-- `com.shopsphere.rmi.ShopRmiServer`
-- `com.shopsphere.rmi.ShopRmiClient`
-- `com.shopsphere.serialization.SerializationDemo`
-- `com.shopsphere.desktop.AdminDesktopApp`
-- `com.shopsphere.i18n.I18nDemo`
+## Deployment
+Build target/shopsphere.war and deploy it to Tomcat 11. The repository includes deploy/tomcat/context.xml as the JNDI datasource template.
 
-## Important educational note
-The repository contains working educational implementations for the requested phases. The current checkout records Cash on Delivery/local payment state; it is not a live payment gateway. Production deployment still needs items such as connection pooling, CSRF protection, centralized error pages, deployment-specific JNDI configuration, and further automated integration testing.
+## Important scope note
+The RTU guide's official academic development plan is Phases 1–17. The repository's later numbered hardening batches extend that plan. Payment remains local/mock rather than a live gateway, and the login limiter is intentionally in-memory for this student project.
