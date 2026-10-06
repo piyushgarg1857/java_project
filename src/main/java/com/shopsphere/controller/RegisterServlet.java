@@ -22,7 +22,6 @@ public class RegisterServlet extends HttpServlet {
             String name=InputValidator.maxLength(InputValidator.required(req.getParameter("name"),"Name"),"Name",100);
             String email=InputValidator.email(req.getParameter("email"));
             String password=InputValidator.required(req.getParameter("password"),"Password");
-            if(password.length()<6) throw new IllegalArgumentException("Password must contain at least 6 characters.");
             String mobile=InputValidator.mobile(req.getParameter("mobile"));
             boolean created=authService.register(name,email,password,mobile);
             if(!created) {
