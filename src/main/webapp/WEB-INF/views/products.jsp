@@ -1,7 +1,17 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ page import="com.shopsphere.model.User" %>
-<% User u = (User) session.getAttribute("loggedInUser"); %>
+<%@ page import="com.shopsphere.model.Product" %>
+<%@ page import="java.util.List" %>
+<% 
+    User u = (User) session.getAttribute("loggedInUser"); 
+    List<Product> products = (List<Product>) request.getAttribute("products");
+    String query = (String) request.getAttribute("query");
+    if (query == null) query = "";
+    String sort = (String) request.getAttribute("sort");
+    if (sort == null) sort = "newest";
+    Integer pageObj = (Integer) request.getAttribute("page");
+    int currentPage = pageObj == null ? 1 : pageObj;
+%>
 <!doctype html>
 <html lang="en">
 <head>
@@ -89,86 +99,82 @@
         <!-- SEARCH AND FILTER BAR -->
         <div class="filter-bar">
             <form method="get" action="${pageContext.request.contextPath}/products" class="filter-form">
-                <input name="q" value="${query}" placeholder="Search products by name or brand…">
+                <input name="q" value="<%= query %>" placeholder="Search products by name or brand…">
                 
                 <select name="sort">
-                    <option value="newest" ${sort == 'newest' ? 'selected' : ''}>Sort: Newest Arrivals</option>
-                    <option value="price_asc" ${sort == 'price_asc' ? 'selected' : ''}>Price: Low to High</option>
-                    <option value="price_desc" ${sort == 'price_desc' ? 'selected' : ''}>Price: High to Low</option>
-                    <option value="stock" ${sort == 'stock' ? 'selected' : ''}>Availability: In Stock</option>
+                    <option value="newest" <%= "newest".equals(sort) ? "selected" : "" %>>Sort: Newest Arrivals</option>
+                    <option value="price_asc" <%= "price_asc".equals(sort) ? "selected" : "" %>>Price: Low to High</option>
+                    <option value="price_desc" <%= "price_desc".equals(sort) ? "selected" : "" %>>Price: High to Low</option>
+                    <option value="stock" <%= "stock".equals(sort) ? "selected" : "" %>>Availability: In Stock</option>
                 </select>
 
                 <button type="submit" class="btn">Filter Products</button>
-                <c:if test="${not empty query}">
+                <% if (!query.isEmpty()) { %>
                     <a href="${pageContext.request.contextPath}/products" class="btn ghost">Clear Search</a>
-                </c:if>
+                <% } %>
             </form>
         </div>
 
         <!-- PRODUCTS GRID -->
-        <c:choose>
-            <c:when test="${empty products}">
-                <div class="card" style="text-align: center; padding: 4rem 2rem;">
-                    <div style="font-size: 3.5rem; margin-bottom: 1rem;">🔍</div>
-                    <h3>No products found matching your search</h3>
-                    <p class="muted" style="margin-top: 0.5rem;">Try adjusting your search terms or filters to find what you're looking for.</p>
-                    <a href="${pageContext.request.contextPath}/products" class="btn" style="margin-top: 1.5rem;">Reset All Filters</a>
-                </div>
-            </c:when>
-            <c:otherwise>
-                <div id="productGrid" class="grid">
-                    <c:forEach var="product" items="${products}">
-                        <article class="product-card">
-                            <div class="product-image">
-                                <span class="product-tag">${product.brand}</span>
-                                📦
+        <% if (products == null || products.isEmpty()) { %>
+            <div class="card" style="text-align: center; padding: 4rem 2rem;">
+                <div style="font-size: 3.5rem; margin-bottom: 1rem;">🔍</div>
+                <h3>No products found matching your search</h3>
+                <p class="muted" style="margin-top: 0.5rem;">Try adjusting your search terms or filters to find what you're looking for.</p>
+                <a href="${pageContext.request.contextPath}/products" class="btn" style="margin-top: 1.5rem;">Reset All Filters</a>
+            </div>
+        <% } else { %>
+            <div id="productGrid" class="grid">
+                <% for (Product p : products) { %>
+                    <article class="product-card">
+                        <div class="product-image">
+                            <span class="product-tag"><%= p.getBrand() != null ? p.getBrand() : "ShopSphere" %></span>
+                            📦
+                        </div>
+
+                        <div class="product-body">
+                            <span class="chip"><%= p.getBrand() != null ? p.getBrand() : "ShopSphere" %></span>
+                            <a class="product-title" href="${pageContext.request.contextPath}/product?id=<%= p.getProductId() %>"><%= p.getName() %></a>
+                            <p class="muted" style="font-size: 0.85rem; line-height: 1.4;"><%= p.getDescription() != null ? p.getDescription() : "" %></p>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.6rem;">
+                                <span class="price">₹<%= String.format("%.2f", p.getPrice()) %></span>
+                                <% if (p.getStock() > 0) { %>
+                                    <span class="chip success"><%= p.getStock() %> in stock</span>
+                                <% } else { %>
+                                    <span class="chip danger">Out of Stock</span>
+                                <% } %>
                             </div>
 
-                            <div class="product-body">
-                                <span class="chip">${product.brand}</span>
-                                <a class="product-title" href="${pageContext.request.contextPath}/product?id=${product.productId}">${product.name}</a>
-                                <p class="muted" style="font-size: 0.85rem; line-height: 1.4;">${product.description}</p>
-                                
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.6rem;">
-                                    <span class="price">₹${product.price}</span>
-                                    <c:if test="${product.stock > 0}">
-                                        <span class="chip success">${product.stock} in stock</span>
-                                    </c:if>
-                                    <c:if test="${product.stock <= 0}">
-                                        <span class="chip danger">Out of Stock</span>
-                                    </c:if>
-                                </div>
-
-                                <div class="product-actions">
-                                    <c:if test="${product.stock > 0}">
-                                        <form method="post" action="${pageContext.request.contextPath}/cart" style="flex: 1; display: flex; gap: 0.4rem;">
-                                            <input type="hidden" name="productId" value="${product.productId}">
-                                            <input style="width:65px; text-align: center;" type="number" name="quantity" value="1" min="1" max="${product.stock}" required>
-                                            <button type="submit" style="flex: 1;">Add to Cart 🛒</button>
-                                        </form>
-                                    </if>
-                                    <form method="post" action="${pageContext.request.contextPath}/wishlist">
-                                        <input type="hidden" name="productId" value="${product.productId}">
-                                        <button class="btn ghost" type="submit" title="Add to Wishlist">♡</button>
+                            <div class="product-actions">
+                                <% if (p.getStock() > 0) { %>
+                                    <form method="post" action="${pageContext.request.contextPath}/cart" style="flex: 1; display: flex; gap: 0.4rem;">
+                                        <input type="hidden" name="productId" value="<%= p.getProductId() %>">
+                                        <input style="width:65px; text-align: center;" type="number" name="quantity" value="1" min="1" max="<%= p.getStock() %>" required>
+                                        <button type="submit" style="flex: 1;">Add to Cart 🛒</button>
                                     </form>
-                                </div>
+                                <% } %>
+                                <form method="post" action="${pageContext.request.contextPath}/wishlist">
+                                    <input type="hidden" name="productId" value="<%= p.getProductId() %>">
+                                    <button class="btn ghost" type="submit" title="Add to Wishlist">♡</button>
+                                </form>
                             </div>
-                        </article>
-                    </c:forEach>
-                </div>
+                        </div>
+                    </article>
+                <% } %>
+            </div>
 
-                <!-- PAGINATION -->
-                <div class="filter-bar" style="margin-top: 3rem; justify-content: space-between;">
-                    <span class="muted" style="font-weight: 600;">Showing Page ${page}</span>
-                    <div style="display: flex; gap: 0.5rem;">
-                        <c:if test="${page > 1}">
-                            <a class="btn secondary" href="?q=${query}&sort=${sort}&page=${page-1}">← Previous Page</a>
-                        </c:if>
-                        <a class="btn secondary" href="?q=${query}&sort=${sort}&page=${page+1}">Next Page →</a>
-                    </div>
+            <!-- PAGINATION -->
+            <div class="filter-bar" style="margin-top: 3rem; justify-content: space-between;">
+                <span class="muted" style="font-weight: 600;">Showing Page <%= currentPage %></span>
+                <div style="display: flex; gap: 0.5rem;">
+                    <% if (currentPage > 1) { %>
+                        <a class="btn secondary" href="?q=<%= query %>&sort=<%= sort %>&page=<%= currentPage - 1 %>">← Previous Page</a>
+                    <% } %>
+                    <a class="btn secondary" href="?q=<%= query %>&sort=<%= sort %>&page=<%= currentPage + 1 %>">Next Page →</a>
                 </div>
-            </c:otherwise>
-        </c:choose>
+            </div>
+        <% } %>
     </main>
 
     <!-- FOOTER -->
