@@ -3,6 +3,11 @@ INSERT IGNORE INTO categories(name,description,status) VALUES('Electronics','Ele
 INSERT INTO products(category_id,name,brand,description,price,discount,stock,status) SELECT category_id,'Java Programming','ShopSphere','Advanced Java reference book',799.00,10,25,TRUE FROM categories WHERE name='Books' LIMIT 1;
 INSERT INTO products(category_id,name,brand,description,price,discount,stock,status) SELECT category_id,'Wireless Mouse','ShopSphere','USB wireless mouse',599.00,5,50,TRUE FROM categories WHERE name='Electronics' LIMIT 1;
 
+-- Default Admin User
+INSERT INTO users (name, email, password, mobile, role, status)
+VALUES ('System Admin', 'admin@shopsphere.com', 'AdminPassword#123', '9876543210', 'ADMIN', TRUE)
+ON DUPLICATE KEY UPDATE role='ADMIN', password='AdminPassword#123', status=TRUE;
+
 -- Demo coupon for checkout testing
 INSERT INTO coupons(code,discount_type,discount_value,minimum_order,maximum_discount,expiry_date,status)
 VALUES ('WELCOME10','PERCENT',10,500,200,DATE_ADD(CURRENT_DATE,INTERVAL 90 DAY),TRUE)
