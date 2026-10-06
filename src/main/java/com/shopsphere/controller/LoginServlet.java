@@ -1,7 +1,7 @@
 package com.shopsphere.controller;
 
 import com.shopsphere.model.User;
-import com.shopsphere.security.InputValidator;
+import com.shopsphere.security.InputValidator; import com.shopsphere.security.LoginRateLimiter;
 import com.shopsphere.service.AuthService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -21,6 +21,8 @@ public class LoginServlet extends HttpServlet {
             throws ServletException,IOException {
         try {
             String email=InputValidator.email(req.getParameter("email"));
+            String rateKey=req.getRemoteAddr()+"|"+email;
+            if(!LoginRateLimiter.allow(rateKey)){req.setAttribute("error","Too many login attempts. Please wait a minute.");req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req,resp);return;}
             String password=InputValidator.required(req.getParameter("password"),"Password");
             User user=authService.login(email,password);
             if(user==null) {

@@ -1,7 +1,7 @@
 package com.shopsphere.controller;
 
 import com.shopsphere.model.User;
-import com.shopsphere.service.CartService;
+import com.shopsphere.service.CartService; import com.shopsphere.security.InputValidator;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -31,13 +31,13 @@ public class CartServlet extends HttpServlet {
             throws IOException {
         try {
             User u = user(request);
-            int productId = Integer.parseInt(request.getParameter("productId"));
+            int productId = InputValidator.positiveInt(request.getParameter("productId"),"Product");
             String action = request.getParameter("action");
 
             if ("remove".equals(action)) {
                 service.remove(u.getUserId(), productId);
             } else if ("update".equals(action)) {
-                int quantity = Integer.parseInt(request.getParameter("quantity"));
+                int quantity = InputValidator.positiveInt(request.getParameter("quantity"),"Quantity");
                 service.updateQuantity(u.getUserId(), productId, quantity);
             } else {
                 int quantity = Integer.parseInt(request.getParameter("quantity"));
