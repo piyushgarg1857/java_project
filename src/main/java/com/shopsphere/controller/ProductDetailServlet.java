@@ -1,3 +1,45 @@
 package com.shopsphere.controller;
-import com.shopsphere.dao.ProductDAO; import com.shopsphere.dao.ReviewDAO; import com.shopsphere.model.Product; import jakarta.servlet.*; import jakarta.servlet.annotation.WebServlet; import jakarta.servlet.http.*; import java.io.*; import java.sql.SQLException;
-@WebServlet(urlPatterns={"/product","/product-detail"}) public class ProductDetailServlet extends HttpServlet{private final ProductDAO products=new ProductDAO();private final ReviewDAO reviews=new ReviewDAO();protected void doGet(HttpServletRequest q,HttpServletResponse p)throws ServletException,IOException{try{int id=Integer.parseInt(q.getParameter("id"));Product x=products.findById(id);if(x==null){p.sendError(404,"Product not found");return;}q.setAttribute("product",x);q.setAttribute("reviews",reviews.findByProduct(id));q.getRequestDispatcher("/WEB-INF/views/product-detail.jsp").forward(q,p);}catch(NumberFormatException e){p.sendError(400,"Invalid product id");}catch(SQLException e){throw new ServletException("Unable to load product",e);}}}
+
+import com.shopsphere.dao.ProductDAO;
+import com.shopsphere.dao.ReviewDAO;
+import com.shopsphere.model.Product;
+import jakarta.servlet.*;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.*;
+import java.util.Collections;
+
+@WebServlet(urlPatterns={"/product", "/product-detail"})
+public class ProductDetailServlet extends HttpServlet {
+    private final ProductDAO products = new ProductDAO();
+    private final ReviewDAO reviews = new ReviewDAO();
+
+    @Override
+    protected void doGet(HttpServletRequest q, HttpServletResponse p) throws ServletException, IOException {
+        String idParam = q.getParameter("id");
+        if (idParam == null || idParam.isBlank()) {
+            p.sendRedirect(q.getContextPath() + "/products");
+            return;
+        }
+        try {
+            int id = Integer.parseInt(idParam);
+            Product x = products.findById(id);
+            if (x == null) {
+                p.sendRedirect(q.getContextPath() + "/products");
+                return;
+            }
+            q.setAttribute("product", x);
+            try {
+                q.setAttribute("reviews", reviews.findByProduct(id));
+            } catch (Exception ex) {
+                q.setAttribute("reviews", Collections.emptyList());
+            }
+            q.getRequestDispatcher("/WEB-INF/views/product-detail.jsp").forward(q, p);
+        } catch (NumberFormatException e) {
+            p.sendRedirect(q.getContextPath() + "/products");
+        } catch (Exception e) {
+            e.printStackTrace();
+            p.sendRedirect(q.getContextPath() + "/products");
+        }
+    }
+}
