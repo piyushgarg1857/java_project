@@ -30,12 +30,8 @@
             flex: 1;
             flex-wrap: wrap;
         }
-        .filter-form input {
-            max-width: 320px;
-        }
-        .filter-form select {
-            max-width: 200px;
-        }
+        .filter-form input { max-width: 320px; }
+        .filter-form select { max-width: 200px; }
     </style>
 </head>
 <body>
@@ -96,10 +92,10 @@
                 <input name="q" value="${query}" placeholder="Search products by name or brand…">
                 
                 <select name="sort">
-                    <option value="newest" ${sort=="newest"?"selected":""}>Sort: Newest Arrivals</option>
-                    <option value="price_asc" ${sort=="price_asc"?"selected":""}>Price: Low to High</option>
-                    <option value="price_desc" ${sort=="price_desc"?"selected":""}>Price: High to Low</option>
-                    <option value="stock" ${sort=="stock"?"selected":""}>Availability: In Stock</option>
+                    <option value="newest" ${sort == 'newest' ? 'selected' : ''}>Sort: Newest Arrivals</option>
+                    <option value="price_asc" ${sort == 'price_asc' ? 'selected' : ''}>Price: Low to High</option>
+                    <option value="price_desc" ${sort == 'price_desc' ? 'selected' : ''}>Price: High to Low</option>
+                    <option value="stock" ${sort == 'stock' ? 'selected' : ''}>Availability: In Stock</option>
                 </select>
 
                 <button type="submit" class="btn">Filter Products</button>
@@ -135,12 +131,12 @@
                                 
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.6rem;">
                                     <span class="price">₹${product.price}</span>
-                                    <span class="chip ${product.stock > 0 ? 'success' : 'danger'}">
-                                        <c:choose>
-                                            <c:when test="${product.stock > 0}">${product.stock} in stock</c:when>
-                                            <c:otherwise>Out of Stock</c:otherwise>
-                                        </c:choose>
-                                    </span>
+                                    <c:if test="${product.stock > 0}">
+                                        <span class="chip success">${product.stock} in stock</span>
+                                    </c:if>
+                                    <c:if test="${product.stock <= 0}">
+                                        <span class="chip danger">Out of Stock</span>
+                                    </c:if>
                                 </div>
 
                                 <div class="product-actions">
