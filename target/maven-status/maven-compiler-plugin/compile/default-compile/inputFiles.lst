@@ -3,7 +3,6 @@ D:\java_project\java_project\src\main\java\com\shopsphere\config\DBConnection.ja
 D:\java_project\java_project\src\main\java\com\shopsphere\controller\AddressServlet.java
 D:\java_project\java_project\src\main\java\com\shopsphere\controller\AdminCategoryServlet.java
 D:\java_project\java_project\src\main\java\com\shopsphere\controller\AdminDashboardServlet.java
-D:\java_project\java_project\src\main\java\com\shopsphere\controller\AdminOrderServlet.java
 D:\java_project\java_project\src\main\java\com\shopsphere\controller\AdminProductServlet.java
 D:\java_project\java_project\src\main\java\com\shopsphere\controller\AdminUserServlet.java
 D:\java_project\java_project\src\main\java\com\shopsphere\controller\CartServlet.java

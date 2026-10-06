@@ -3,7 +3,6 @@ com\shopsphere\model\Address.class
 com\shopsphere\web\AdminReviewServlet.class
 com\shopsphere\dao\CategoryDAO.class
 com\shopsphere\config\DBConnection.class
-com\shopsphere\controller\AdminOrderServlet.class
 com\shopsphere\web\AdminExportServlet.class
 com\shopsphere\controller\ErrorServlet.class
 com\shopsphere\controller\WishlistServlet.class
