@@ -11,6 +11,6 @@ public class AdminExportServlet extends HttpServlet {
  }
  private String csv(String v){
   String value=v==null?"":v;
-  return "\\\""+value.replace("\\\"","\\\"\\\"")+"\\\"";
+  return "\""+value.replace("\"","\"\"")+"\"";
  }
 }
