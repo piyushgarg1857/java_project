@@ -1,21 +1,2 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Login - ShopSphere</title></head>
-<body>
-<h1>ShopSphere Login</h1>
-<% if(request.getAttribute("error") != null){ %>
-<p><%= request.getAttribute("error") %></p>
-<% } %>
-<% if("true".equals(request.getParameter("registered"))){ %>
-<p>Registration successful. Please login.</p>
-<% } %>
-<form method="post" action="${pageContext.request.contextPath}/login">
-<label>Email <input type="email" name="email" required></label><br>
-<label>Password <input type="password" name="password" required></label><br>
-<button type="submit">Login</button>
-</form>
-<p><a href="${pageContext.request.contextPath}/register">Create account</a></p>
-<p><a href="${pageContext.request.contextPath}/">Back to home</a></p>
-</body>
-</html>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Login — ShopSphere</title><link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app.css"></head><body><main class="container form-shell"><div class="card"><a class="brand" href="${pageContext.request.contextPath}/">Shop<span>Sphere</span></a><h1 class="form-title">Welcome back</h1><p class="muted">Sign in to manage your cart, wishlist and orders.</p><% if(request.getAttribute("error")!=null){ %><div class="alert error"><%=request.getAttribute("error")%></div><% } %><% if("true".equals(request.getParameter("registered"))){ %><div class="alert success">Registration successful. Please login.</div><% } %><form method="post" action="${pageContext.request.contextPath}/login"><div class="field"><label>Email</label><input type="email" name="email" autocomplete="email" required></div><div class="field"><label>Password</label><input type="password" name="password" autocomplete="current-password" required></div><button type="submit" style="width:100%">Sign in</button></form><p class="muted">New here? <a href="${pageContext.request.contextPath}/register">Create an account</a></p><a class="btn ghost" href="${pageContext.request.contextPath}/">← Back home</a></div></main></body></html>
