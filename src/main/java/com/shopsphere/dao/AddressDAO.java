@@ -12,6 +12,10 @@ public class AddressDAO {
   List<Address> out=new ArrayList<>(); String q="SELECT address_id,user_id,address_line,city,state,pincode,address_type FROM addresses WHERE user_id=? ORDER BY address_id DESC";
   try(Connection c=DBConnection.getConnection();PreparedStatement s=c.prepareStatement(q)){s.setInt(1,userId);try(ResultSet r=s.executeQuery()){while(r.next()){Address a=new Address();a.setAddressId(r.getInt(1));a.setUserId(r.getInt(2));a.setAddressLine(r.getString(3));a.setCity(r.getString(4));a.setState(r.getString(5));a.setPincode(r.getString(6));a.setAddressType(r.getString(7));out.add(a);}}} return out;
  }
+ public Address findOwned(int userId,int addressId)throws SQLException{
+  String q="SELECT address_id,user_id,address_line,city,state,pincode,address_type FROM addresses WHERE address_id=? AND user_id=?";
+  try(Connection c=DBConnection.getConnection();PreparedStatement s=c.prepareStatement(q)){s.setInt(1,addressId);s.setInt(2,userId);try(ResultSet r=s.executeQuery()){if(!r.next())return null;Address a=new Address();a.setAddressId(r.getInt(1));a.setUserId(r.getInt(2));a.setAddressLine(r.getString(3));a.setCity(r.getString(4));a.setState(r.getString(5));a.setPincode(r.getString(6));a.setAddressType(r.getString(7));return a;}}
+ }
  public boolean delete(int userId,int addressId)throws SQLException{
   try(Connection c=DBConnection.getConnection();PreparedStatement s=c.prepareStatement("DELETE FROM addresses WHERE address_id=? AND user_id=?")){s.setInt(1,addressId);s.setInt(2,userId);return s.executeUpdate()==1;}
  }
