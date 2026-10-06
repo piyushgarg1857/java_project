@@ -12,7 +12,7 @@ public final class DBConnection {
  static{try{Class.forName("com.mysql.cj.jdbc.Driver");}catch(ClassNotFoundException e){throw new ExceptionInInitializerError(e);}}
  public static Connection getConnection()throws SQLException{
   DataSource ds=lookupDataSource(); if(ds!=null)return ds.getConnection();
-  String url=required("SHOPSPHERE_DB_URL",DEFAULT_URL),user=required("SHOPSPHERE_DB_USER",null),password=required("SHOPSPHERE_DB_PASSWORD",null);
+  String url=required("SHOPSPHERE_DB_URL",DEFAULT_URL),user=required("SHOPSPHERE_DB_USER","root"),password=required("SHOPSPHERE_DB_PASSWORD","root");
   return DriverManager.getConnection(url,user,password);
  }
  private static DataSource lookupDataSource(){if(dataSource!=null)return dataSource;try{dataSource=(DataSource)new InitialContext().lookup("java:comp/env/jdbc/ShopSphereDB");return dataSource;}catch(NamingException ignored){return null;}}
