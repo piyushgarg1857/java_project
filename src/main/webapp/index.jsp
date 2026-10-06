@@ -36,8 +36,10 @@
             <a class="btn ghost" href="${pageContext.request.contextPath}/products">Search</a>
             <% if (u == null) { %>
                 <a class="btn ghost" href="${pageContext.request.contextPath}/login">Account</a>
+            <% } else if ("ADMIN".equalsIgnoreCase(u.getRole())) { %>
+                <a class="btn ghost" href="${pageContext.request.contextPath}/admin/dashboard">Account</a>
             <% } else { %>
-                <a class="btn ghost" href="<%= "ADMIN".equalsIgnoreCase(u.getRole()) ? "${pageContext.request.contextPath}/admin/dashboard" : "${pageContext.request.contextPath}/profile" %>">Account</a>
+                <a class="btn ghost" href="${pageContext.request.contextPath}/profile">Account</a>
             <% } %>
             <a class="btn ghost" href="${pageContext.request.contextPath}/cart">Cart</a>
         </div>

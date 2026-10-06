@@ -1,5 +1,4 @@
 com\shopsphere\filter\AdminFilter.class
-com\shopsphere\model\Address.class
 com\shopsphere\web\AdminReviewServlet.class
 com\shopsphere\dao\CategoryDAO.class
 com\shopsphere\config\DBConnection.class
@@ -16,16 +15,11 @@ com\shopsphere\rmi\ShopRmiClient.class
 com\shopsphere\dao\OrderDAO.class
 com\shopsphere\util\PasswordUtil.class
 com\shopsphere\controller\ProfileServlet.class
-com\shopsphere\model\User.class
-com\shopsphere\model\Product.class
 com\shopsphere\rmi\ShopRemote.class
 com\shopsphere\controller\CheckoutServlet.class
-com\shopsphere\service\CartService.class
-com\shopsphere\service\OrderService.class
 com\shopsphere\dao\CartDAO.class
 com\shopsphere\serialization\SerializationDemo.class
 com\shopsphere\dao\AddressDAO.class
-com\shopsphere\model\Coupon.class
 com\shopsphere\web\AdminAnalyticsServlet.class
 com\shopsphere\web\SyllabusDemoServlet.class
 com\shopsphere\controller\LoginServlet.class
@@ -40,7 +34,6 @@ com\shopsphere\network\ShopSocketClient.class
 com\shopsphere\rmi\InventoryServiceImpl.class
 com\shopsphere\controller\RegisterServlet.class
 com\shopsphere\jndi\JndiExample.class
-com\shopsphere\service\CatalogAdminService.class
 com\shopsphere\security\LoginRateLimiter$Window.class
 com\shopsphere\controller\CouponServlet.class
 com\shopsphere\desktop\SwingAdminMvcDemo.class
@@ -49,7 +42,6 @@ com\shopsphere\dao\AdminOrderDAO.class
 com\shopsphere\desktop\SwingAdminMvcDemo$Model.class
 com\shopsphere\service\ProductService.class
 com\shopsphere\web\UrlConnectionDemo.class
-com\shopsphere\service\CouponService.class
 com\shopsphere\controller\AdminDashboardServlet.class
 com\shopsphere\network\InventorySocketServer.class
 com\shopsphere\dao\PaymentDAO.class
@@ -67,7 +59,6 @@ com\shopsphere\security\InputValidator.class
 com\shopsphere\controller\AdminUserServlet.class
 com\shopsphere\controller\PaymentServlet.class
 com\shopsphere\dao\ReviewDAO.class
-com\shopsphere\model\CartItem.class
 com\shopsphere\i18n\I18nDemo.class
 com\shopsphere\controller\CartServlet.class
 com\shopsphere\security\LoginRateLimiter.class
@@ -89,5 +80,4 @@ com\shopsphere\desktop\AdminDesktopApp.class
 com\shopsphere\web\VisitListener.class
 com\shopsphere\rmi\ShopRemoteImpl.class
 com\shopsphere\web\CorrelationIdFilter.class
-com\shopsphere\service\AuthService.class
 com\shopsphere\rmi\InventoryRmiServer.class

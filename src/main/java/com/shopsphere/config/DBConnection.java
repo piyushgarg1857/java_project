@@ -16,7 +16,10 @@ public final class DBConnection {
    String user=required("SHOPSPHERE_DB_USER","root"),password=required("SHOPSPHERE_DB_PASSWORD","root");
    return DriverManager.getConnection(envUrl,user,password);
   }
-  DataSource ds=lookupDataSource(); if(ds!=null)return ds.getConnection();
+  DataSource ds=lookupDataSource();
+  if(ds!=null){
+   try{ return ds.getConnection(); }catch(SQLException ignored){}
+  }
   String url=required("SHOPSPHERE_DB_URL",DEFAULT_URL),user=required("SHOPSPHERE_DB_USER","root"),password=required("SHOPSPHERE_DB_PASSWORD","root");
   return DriverManager.getConnection(url,user,password);
  }
