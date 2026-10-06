@@ -21,7 +21,8 @@ public class LoginServlet extends HttpServlet {
             throws ServletException,IOException {
         try {
             String email=InputValidator.email(req.getParameter("email"));
-            String rateKey=req.getRemoteAddr()+"|"+email;\n            if(!LoginRateLimiter.allow(rateKey)){req.setAttribute("error","Too many login attempts. Please wait a minute.");req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req,resp);return;}
+            String rateKey=req.getRemoteAddr()+"|"+email;
+            if(!LoginRateLimiter.allow(rateKey)){req.setAttribute("error","Too many login attempts. Please wait a minute.");req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req,resp);return;}
             String password=InputValidator.required(req.getParameter("password"),"Password");
             User user=authService.login(email,password);
             if(user==null) {
