@@ -1,6 +1,6 @@
 package com.shopsphere.controller;
 
-import com.shopsphere.model.Coupon;
+import com.shopsphere.model.Address; import com.shopsphere.dao.AddressDAO; import com.shopsphere.model.Coupon;
 import com.shopsphere.model.User;
 import com.shopsphere.security.InputValidator;
 import com.shopsphere.service.OrderService;
@@ -11,7 +11,7 @@ import java.io.IOException;
 
 @WebServlet("/checkout")
 public class CheckoutServlet extends HttpServlet {
-    private final OrderService service=new OrderService();
+    private final OrderService service=new OrderService(); private final AddressDAO addresses=new AddressDAO();
 
     private User user(HttpServletRequest r){return (User)r.getSession().getAttribute("loggedInUser");}
 
@@ -24,6 +24,7 @@ public class CheckoutServlet extends HttpServlet {
             r.setAttribute("couponDiscount",discount);
             r.setAttribute("payableTotal",total-discount);
             r.setAttribute("checkoutCoupon",coupon);
+            r.setAttribute("savedAddresses",addresses.findByUser(user(r).getUserId()));
             r.getRequestDispatcher("/WEB-INF/views/checkout.jsp").forward(r,p);
         }catch(Exception e){throw new ServletException("Unable to load checkout",e);}
     }
@@ -46,10 +47,19 @@ public class CheckoutServlet extends HttpServlet {
                 p.sendRedirect(r.getContextPath()+"/checkout");
                 return;
             }
-            String address=InputValidator.maxLength(InputValidator.required(r.getParameter("addressLine"),"Address"),"Address",255);
-            String city=InputValidator.maxLength(InputValidator.required(r.getParameter("city"),"City"),"City",100);
-            String state=InputValidator.maxLength(InputValidator.required(r.getParameter("state"),"State"),"State",100);
-            String pincode=InputValidator.pincode(r.getParameter("pincode"));
+            String address; String city; String state; String pincode;
+            String addressIdParam=r.getParameter("addressId");
+            if(addressIdParam!=null&&!addressIdParam.isBlank()){
+                int addressId=InputValidator.positiveInt(addressIdParam,"Address");
+                Address saved=addresses.findOwned(u.getUserId(),addressId);
+                if(saved==null)throw new IllegalArgumentException("Selected address was not found.");
+                address=saved.getAddressLine(); city=saved.getCity(); state=saved.getState(); pincode=saved.getPincode();
+            }else{
+                address=InputValidator.maxLength(InputValidator.required(r.getParameter("addressLine"),"Address"),"Address",255);
+                city=InputValidator.maxLength(InputValidator.required(r.getParameter("city"),"City"),"City",100);
+                state=InputValidator.maxLength(InputValidator.required(r.getParameter("state"),"State"),"State",100);
+                pincode=InputValidator.pincode(r.getParameter("pincode"));
+            }
             Coupon c=(Coupon)session.getAttribute("checkoutCoupon");
             String code=c==null?null:c.getCode();
             int id=service.placeOrder(u.getUserId(),address,city,state,pincode,code);

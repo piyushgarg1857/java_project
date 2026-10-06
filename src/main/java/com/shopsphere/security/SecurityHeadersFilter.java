@@ -12,6 +12,7 @@ public class SecurityHeadersFilter implements Filter {
             throws IOException, ServletException {
         HttpServletResponse http = (HttpServletResponse) response;
         http.setHeader("X-Content-Type-Options", "nosniff");
+        if (request instanceof jakarta.servlet.http.HttpServletRequest req && req.getSession(false) != null) { http.setHeader("Cache-Control", "no-store"); }
         http.setHeader("X-Frame-Options", "DENY");
         http.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
         http.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");

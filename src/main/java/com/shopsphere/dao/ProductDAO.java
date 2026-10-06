@@ -5,6 +5,7 @@ import com.shopsphere.model.Product;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class ProductDAO {
     private static final String FIND_ALL =
@@ -30,6 +31,27 @@ public class ProductDAO {
                 return rs.next() ? map(rs) : null;
             }
         }
+    }
+
+    public List<Product> search(String term, int categoryId, String sort, int page, int size) throws SQLException {
+        StringBuilder q=new StringBuilder("SELECT product_id, category_id, name, brand, description, price, discount, stock, image_url, status FROM products WHERE status=TRUE");
+        List<Object> args=new ArrayList<>();
+        if(term!=null&&!term.isBlank()){q.append(" AND (LOWER(name) LIKE ? OR LOWER(brand) LIKE ?)");String x="%"+term.trim().toLowerCase(Locale.ROOT)+"%";args.add(x);args.add(x);}
+        if(categoryId>0){q.append(" AND category_id=?");args.add(categoryId);}
+        String order=safeSort(sort); q.append(" ORDER BY ").append(order).append(" LIMIT ? OFFSET ?");
+        int safePage=Math.max(1,page),safeSize=Math.min(50,Math.max(1,size)); args.add(safeSize);args.add((safePage-1)*safeSize);
+        try(Connection c=DBConnection.getConnection();PreparedStatement s=c.prepareStatement(q.toString())){
+            for(int i=0;i<args.size();i++){Object a=args.get(i);if(a instanceof Integer)s.setInt(i+1,(Integer)a);else s.setString(i+1,a.toString());}
+            try(ResultSet rs=s.executeQuery()){List<Product> out=new ArrayList<>();while(rs.next())out.add(map(rs));return out;}
+        }
+    }
+    private String safeSort(String sort){
+        return switch(sort==null?"newest":sort){
+            case "price_asc" -> "price ASC, product_id DESC";
+            case "price_desc" -> "price DESC, product_id DESC";
+            case "stock" -> "stock DESC, product_id DESC";
+            default -> "product_id DESC";
+        };
     }
 
     private Product map(ResultSet rs) throws SQLException {

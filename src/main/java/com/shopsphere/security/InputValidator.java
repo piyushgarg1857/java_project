@@ -39,6 +39,8 @@ public final class InputValidator {
         return v;
     }
 
+    public static int nonNegativeInt(String value,String field){try{int n=Integer.parseInt(required(value,field));if(n<0)throw new NumberFormatException();return n;}catch(NumberFormatException e){throw new IllegalArgumentException(field+" must be zero or a positive number.");}}
+
     public static int positiveInt(String value, String field) {
         try {
             int n = Integer.parseInt(required(value, field));
