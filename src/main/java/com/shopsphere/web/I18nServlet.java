@@ -2,6 +2,7 @@ package com.shopsphere.web;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import jakarta.servlet.ServletException;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -10,7 +11,7 @@ import java.util.ResourceBundle;
 
 @WebServlet("/language")
 public class I18nServlet extends HttpServlet {
-    @Override protected void doGet(HttpServletRequest req,HttpServletResponse resp)throws IOException{
+    @Override protected void doGet(HttpServletRequest req,HttpServletResponse resp)throws IOException, ServletException{
         String language=req.getParameter("lang");
         Locale locale="hi".equalsIgnoreCase(language)?Locale.forLanguageTag("hi-IN"):Locale.ENGLISH;
         ResourceBundle bundle=ResourceBundle.getBundle("messages",locale);
