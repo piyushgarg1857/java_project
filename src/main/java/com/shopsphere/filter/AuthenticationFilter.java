@@ -6,20 +6,20 @@ import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 
-@WebFilter(urlPatterns={"/cart","/wishlist","/checkout","/orders","/profile","/password","/addresses"})
+@WebFilter(urlPatterns={"/cart", "/wishlist", "/checkout", "/orders", "/profile", "/password", "/addresses", "/order-detail", "/reviews"})
 public class AuthenticationFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        HttpServletRequest req=(HttpServletRequest)request;
-        HttpServletResponse resp=(HttpServletResponse)response;
-        HttpSession session=req.getSession(false);
-        User user=session == null ? null : (User)session.getAttribute("loggedInUser");
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse resp = (HttpServletResponse) response;
+        HttpSession session = req.getSession(false);
+        User user = session == null ? null : (User) session.getAttribute("loggedInUser");
 
-        if(user==null) {
-            resp.sendRedirect(req.getContextPath()+"/login");
+        if (user == null) {
+            resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
-        chain.doFilter(request,response);
+        chain.doFilter(request, response);
     }
 }
