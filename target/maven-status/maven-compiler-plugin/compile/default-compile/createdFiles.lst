@@ -83,6 +83,7 @@ com\shopsphere\controller\AdminUserServlet.class
 com\shopsphere\controller\PaymentServlet.class
 com\shopsphere\dao\ReviewDAO.class
 com\shopsphere\i18n\I18nDemo.class
+com\shopsphere\controller\GoogleOAuthServlet.class
 com\shopsphere\dao\ProductDAO.class
 com\shopsphere\web\PreferenceCookieServlet.class
 com\shopsphere\admin\OrderStatusValidator.class
