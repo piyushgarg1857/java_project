@@ -96,10 +96,11 @@
             };
             int i = 0;
             for (Product p : featuredProducts) {
-                String image = productImages[i % productImages.length];
+                String image = (p.getImageUrl() != null && !p.getImageUrl().trim().isEmpty()) ? p.getImageUrl() : productImages[i % productImages.length];
         %>
         <article class="product-card">
-            <a class="product-image" href="${pageContext.request.contextPath}/product?id=<%= p.getProductId() %>" style="background-image:url('<%= image %>');background-size:cover;background-position:center;">
+            <a class="product-image" href="${pageContext.request.contextPath}/product?id=<%= p.getProductId() %>">
+                <img src="<%= image %>" alt="<%= p.getName() %>">
                 <span class="product-tag"><%= p.getStock() > 0 ? "NEW" : "SOLD OUT" %></span>
             </a>
             <div class="product-body">
