@@ -30,6 +30,11 @@ public class CheckoutServlet extends HttpServlet {
         }
         try {
             double total = service.cartTotal(u.getUserId());
+            if (total <= 0) {
+                r.getSession().setAttribute("cartMessage", "Your bag is empty. Please add items before checking out.");
+                p.sendRedirect(r.getContextPath() + "/cart");
+                return;
+            }
             Coupon coupon = (Coupon) r.getSession().getAttribute("checkoutCoupon");
             double discount = service.couponDiscount(coupon, total);
             r.setAttribute("cartTotal", total);
@@ -100,6 +105,9 @@ public class CheckoutServlet extends HttpServlet {
             r.setAttribute("orderId", id);
             r.getRequestDispatcher("/WEB-INF/views/order-success.jsp").forward(r, p);
 
+        } catch (IllegalStateException e) {
+            session.setAttribute("cartMessage", "Your bag is empty. Please add items before checking out.");
+            p.sendRedirect(r.getContextPath() + "/cart");
         } catch (IllegalArgumentException e) {
             session.setAttribute("checkoutMessage", e.getMessage());
             p.sendRedirect(r.getContextPath() + "/checkout");
