@@ -3,6 +3,7 @@
 <%
     Map<String, Object> order = (Map<String, Object>) request.getAttribute("order");
     List<Map<String, Object>> items = (List<Map<String, Object>>) request.getAttribute("items");
+    String ctx = request.getContextPath();
 %>
 <!doctype html>
 <html lang="en">
@@ -10,13 +11,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Order #<%= order != null ? order.get("orderId") : "" %> — ShopSphere</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app.css">
+    <link rel="stylesheet" href="<%= ctx %>/assets/css/app.css">
 </head>
 <body>
-<nav class="nav-header">
+<nav class="nav">
     <div class="container nav-inner">
-        <a class="brand-logo" href="${pageContext.request.contextPath}/">ShopSphere</a>
-        <a class="btn ghost" href="${pageContext.request.contextPath}/orders">← Back to orders</a>
+        <a class="brand" href="<%= ctx %>/">Shop<span>Sphere</span></a>
+        <a class="btn ghost" href="<%= ctx %>/orders">← Back to my orders</a>
     </div>
 </nav>
 <main class="container section">
@@ -36,20 +37,30 @@
             <h3>Items in this order</h3>
             <div class="table-wrap" style="margin-top:16px;">
                 <table>
-                    <tr>
-                        <th>Product</th>
-                        <th>Price</th>
-                        <th>Qty</th>
-                        <th>Subtotal</th>
-                    </tr>
-                    <% if (items != null) { for (Map<String, Object> item : items) { %>
-                    <tr>
-                        <td><strong><%= item.get("productName") %></strong></td>
-                        <td>₹<%= item.get("unitPrice") %></td>
-                        <td><%= item.get("quantity") %></td>
-                        <td><strong>₹<%= item.get("totalPrice") %></strong></td>
-                    </tr>
-                    <% } } %>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Qty</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (items != null && !items.isEmpty()) { 
+                            for (Map<String, Object> item : items) { %>
+                        <tr>
+                            <td><strong><%= item.get("productName") %></strong></td>
+                            <td>₹<%= item.get("unitPrice") %></td>
+                            <td><%= item.get("quantity") %></td>
+                            <td><strong>₹<%= item.get("totalPrice") %></strong></td>
+                        </tr>
+                        <%  } 
+                           } else { %>
+                        <tr>
+                            <td colspan="4" class="empty">No item details found for this order.</td>
+                        </tr>
+                        <% } %>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -78,13 +89,14 @@
         </div>
     </div>
 </main>
-<footer class="main-footer">
-    <div class="container">
-        <div class="footer-bottom">
-            <span>© 2026 ShopSphere</span>
-            <a href="${pageContext.request.contextPath}/products">Continue shopping</a>
+<footer class="footer">
+    <div class="container footer-inner">
+        <div>© 2026 ShopSphere. All rights reserved.</div>
+        <div>
+            <a href="<%= ctx %>/products" class="muted">Continue shopping</a>
         </div>
     </div>
 </footer>
 </body>
 </html>
+
