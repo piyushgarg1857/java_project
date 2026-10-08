@@ -8,50 +8,96 @@
     <title>Order Placed — ShopSphere</title>
     <link rel="stylesheet" href="<%= ctx %>/assets/css/app.css">
     <style>
-        .success-card { max-width: 540px; margin: 60px auto; text-align: center; padding: 40px 30px; }
-        .success-icon { width: 72px; height: 72px; background: #e6f4ea; color: #137333; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: 24px; }
+        .success-wrapper {
+            max-width: 600px;
+            margin: 40px auto 80px;
+            text-align: center;
+        }
+        .success-icon-badge {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: rgba(155, 184, 159, 0.12);
+            border: 1px solid rgba(155, 184, 159, 0.35);
+            color: var(--success, #9bb89f);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+        .receipt-card {
+            background: var(--surface, #121212);
+            border: 1px solid var(--line, rgba(255,255,255,.12));
+            padding: 28px;
+            margin: 28px 0;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
-<nav class="nav">
+<div class="announcement-bar"><span>CURATED PRODUCTS FOR MODERN LIVING</span></div>
+<header class="nav-header">
     <div class="container nav-inner">
-        <a class="brand" href="<%= ctx %>/">Shop<span>Sphere</span></a>
-        <a class="btn ghost" href="<%= ctx %>/orders">My Orders</a>
+        <nav class="nav-menu">
+            <a class="nav-link" href="<%= ctx %>/">Shop</a>
+            <a class="nav-link" href="<%= ctx %>/products">Collections</a>
+        </nav>
+        <a class="brand-logo" href="<%= ctx %>/">ShopSphere</a>
+        <div>
+            <a class="btn ghost" href="<%= ctx %>/orders">My Orders</a>
+        </div>
     </div>
-</nav>
+</header>
 
-<main class="container">
-    <div class="card success-card">
-        <div class="success-icon">✓</div>
+<main class="container section">
+    <div class="success-wrapper">
+        <div class="success-icon-badge">✓</div>
         <span class="eyebrow" style="color:var(--accent);">THANK YOU FOR YOUR ORDER</span>
-        <h1 style="margin: 12px 0 8px 0; font-family: var(--font-serif, serif);">Order #${orderId} Placed!</h1>
-        <p class="muted">Your order has been confirmed. A receipt has been generated and sent to your email.</p>
-        
-        <div style="background: var(--bg-body, #fafafa); border: 1px dashed var(--line, #ddd); border-radius: 8px; padding: 16px; margin: 24px 0; text-align: left;">
-            <div style="display:flex; justify-content:space-between; margin-bottom: 8px;">
-                <span class="muted">Order Number:</span>
-                <strong>#${orderId}</strong>
+        <h1 class="section-title" style="margin-top:8px;">Order #${orderId} Confirmed.</h1>
+        <p class="muted" style="margin-top:12px; font-size:14px;">Your purchase has been recorded. An order confirmation receipt has been dispatched to your email.</p>
+
+        <div class="receipt-card">
+            <div class="receipt-row">
+                <span class="muted">Order Reference</span>
+                <strong style="color:var(--text); font-family:var(--sans);">#${orderId}</strong>
             </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom: 8px;">
-                <span class="muted">Status:</span>
+            <div class="receipt-row">
+                <span class="muted">Order Status</span>
                 <span class="chip success">CONFIRMED</span>
             </div>
-            <div style="display:flex; justify-content:space-between;">
-                <span class="muted">Payment Method:</span>
-                <strong>Cash on Delivery (COD) / Verified</strong>
+            <div class="receipt-row">
+                <span class="muted">Payment Method</span>
+                <span style="color:var(--text); font-weight:600;">Cash on Delivery (COD)</span>
+            </div>
+            <div class="receipt-row" style="border-top:1px solid var(--line); padding-top:14px; margin-top:4px;">
+                <span class="muted">Delivery Status</span>
+                <span class="chip">PREPARING FOR DISPATCH</span>
             </div>
         </div>
 
-        <div style="display:flex; gap: 12px; justify-content: center;">
-            <a class="button primary" href="<%= ctx %>/order-detail?orderId=${orderId}">View Order Details</a>
-            <a class="button secondary" href="<%= ctx %>/products">Continue Shopping</a>
+        <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+            <a class="btn" href="<%= ctx %>/order-detail?orderId=${orderId}">View Order Details</a>
+            <a class="btn ghost" href="<%= ctx %>/products">Continue Shopping</a>
         </div>
     </div>
 </main>
 
-<footer class="footer">
-    <div class="container footer-inner">
-        <div>© 2026 ShopSphere. All rights reserved.</div>
+<footer class="main-footer">
+    <div class="container">
+        <div class="footer-bottom">
+            <span>© 2026 ShopSphere</span>
+            <span>Refined shopping for everyday life.</span>
+        </div>
     </div>
 </footer>
 </body>
