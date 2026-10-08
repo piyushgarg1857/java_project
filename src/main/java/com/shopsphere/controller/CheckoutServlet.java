@@ -16,6 +16,12 @@ public class CheckoutServlet extends HttpServlet {
     private final OrderService service = new OrderService();
     private final AddressDAO addresses = new AddressDAO();
 
+    private String getRazorpayKeyId() {
+        String key = System.getenv("RAZORPAY_KEY_ID");
+        if (key != null && !key.isBlank()) return key.trim();
+        return "rzp_test_TlXJYK6hDkOsvX";
+    }
+
     private User user(HttpServletRequest r) {
         HttpSession s = r.getSession(false);
         return s == null ? null : (User) s.getAttribute("loggedInUser");
@@ -42,6 +48,7 @@ public class CheckoutServlet extends HttpServlet {
             r.setAttribute("payableTotal", total - discount);
             r.setAttribute("checkoutCoupon", coupon);
             r.setAttribute("savedAddresses", addresses.findByUser(u.getUserId()));
+            r.setAttribute("razorpayKeyId", getRazorpayKeyId());
             r.getRequestDispatcher("/WEB-INF/views/checkout.jsp").forward(r, p);
         } catch (Exception e) {
             throw new ServletException("Unable to load checkout", e);
@@ -88,6 +95,8 @@ public class CheckoutServlet extends HttpServlet {
 
             String paymentMethod = r.getParameter("paymentMethod");
             if (paymentMethod == null || paymentMethod.isBlank()) paymentMethod = "COD";
+
+            String razorpayPaymentId = r.getParameter("razorpay_payment_id");
 
             String paymentStatus = "RAZORPAY".equalsIgnoreCase(paymentMethod) || "ONLINE".equalsIgnoreCase(paymentMethod) ? "SUCCESS" : "PENDING";
 

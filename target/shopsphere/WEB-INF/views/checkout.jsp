@@ -5,6 +5,7 @@
 <% Coupon checkoutCoupon = (Coupon) request.getAttribute("checkoutCoupon"); %>
 <% String checkoutMessage = (String) session.getAttribute("checkoutMessage"); %>
 <% List<Address> savedAddresses = (List<Address>) request.getAttribute("savedAddresses"); %>
+<% String rzpKey = (String) request.getAttribute("razorpayKeyId"); %>
 <!doctype html>
 <html lang="en">
 <head>
@@ -58,6 +59,8 @@
 
         <!-- Main Order Form -->
         <form id="checkoutForm" method="post" action="<%= ctx %>/checkout" style="margin-top:24px;">
+            <input type="hidden" name="razorpay_payment_id" id="rzpPaymentId" value="">
+            
             <h3 style="font-size:14px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--accent); margin-bottom:12px;">Delivery Address</h3>
 
             <% if (savedAddresses != null && !savedAddresses.isEmpty()) { %>
@@ -111,7 +114,7 @@
                 <input type="radio" name="paymentMethod" value="RAZORPAY">
                 <div>
                     <strong style="display:block; color:#f3efe7; font-size:13px;">Razorpay Online (UPI / Credit & Debit Cards / NetBanking)</strong>
-                    <span style="font-size:11px; color:#a6a19a;">Instant secure online payment with Razorpay Sandbox.</span>
+                    <span style="font-size:11px; color:#a6a19a;">Instant secure online payment with Razorpay Test Modal.</span>
                 </div>
             </label>
 
@@ -126,6 +129,8 @@
     function togglePaymentChoice(el) {
         document.querySelectorAll('.pay-option').forEach(item => item.classList.remove('active'));
         el.classList.add('active');
+        const radio = el.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
     }
 
     function handleCheckoutSubmit() {
@@ -149,12 +154,13 @@
 
         if (selectedMethod === 'RAZORPAY') {
             const options = {
-                "key": "rzp_test_shopsphere_mock",
-                "amount": parseFloat(total) * 100,
+                "key": "<%= rzpKey != null ? rzpKey : "rzp_test_TlXJYK6hDkOsvX" %>",
+                "amount": Math.round(parseFloat(total) * 100),
                 "currency": "INR",
                 "name": "ShopSphere Luxury E-Commerce",
                 "description": "Order Payment",
                 "handler": function (response) {
+                    document.getElementById('rzpPaymentId').value = response.razorpay_payment_id || "pay_test_success";
                     form.submit();
                 },
                 "prefill": {
@@ -169,6 +175,7 @@
                 const rzp = new Razorpay(options);
                 rzp.open();
             } catch (e) {
+                console.error("Razorpay error:", e);
                 form.submit();
             }
         } else {
