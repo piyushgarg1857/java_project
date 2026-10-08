@@ -15,9 +15,10 @@ public class EmailService {
 
     private static final String SMTP_HOST = System.getenv().getOrDefault("SMTP_HOST", "smtp.gmail.com");
     private static final String SMTP_PORT = System.getenv().getOrDefault("SMTP_PORT", "587");
-    private static final String SMTP_USER = System.getenv().getOrDefault("SMTP_USER", "");
-    private static final String SMTP_PASS = System.getenv().getOrDefault("SMTP_PASS", "");
-    private static final String FROM_EMAIL = System.getenv().getOrDefault("FROM_EMAIL", "noreply@shopsphere-online.azurewebsites.net");
+    private static final String SMTP_USER = System.getenv().getOrDefault("SMTP_USER", "piyushgarg5931@gmail.com");
+    private static final String SMTP_PASS = System.getenv().getOrDefault("SMTP_PASS", "ifiopuydvafncojs");
+    private static final String FROM_EMAIL = System.getenv().getOrDefault("FROM_EMAIL", "piyushgarg5931@gmail.com");
+
 
     public static void sendOrderReceiptAsync(String recipientEmail, String userName, int orderId, double totalAmount) {
         ASYNC_EXECUTOR.submit(() -> {
