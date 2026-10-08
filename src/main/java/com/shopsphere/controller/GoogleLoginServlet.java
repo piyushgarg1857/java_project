@@ -22,30 +22,37 @@ public class GoogleLoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String credential = req.getParameter("credential");
-        if (credential == null || credential.isBlank()) {
-            req.setAttribute("error", "Google Sign-In failed. Please try again.");
-            req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
-            return;
-        }
+        String googleEmail = req.getParameter("googleEmail");
+        String googleName = req.getParameter("googleName");
+
+        String email = null;
+        String name = null;
 
         try {
-            // Parse JWT payload (header.payload.signature)
-            String[] parts = credential.split("\\.");
-            if (parts.length < 2) {
-                throw new IllegalArgumentException("Invalid Google ID Token format");
+            if (credential != null && !credential.isBlank() && credential.contains(".")) {
+                String[] parts = credential.split("\\.");
+                if (parts.length >= 2) {
+                    String payloadJson = new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
+                    email = extractJsonField(payloadJson, "email");
+                    name = extractJsonField(payloadJson, "name");
+                }
             }
 
-            String payloadJson = new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
-            String email = extractJsonField(payloadJson, "email");
-            String name = extractJsonField(payloadJson, "name");
+            if ((email == null || email.isBlank()) && googleEmail != null && !googleEmail.isBlank()) {
+                email = googleEmail.trim().toLowerCase();
+                name = (googleName != null && !googleName.isBlank()) ? googleName.trim() : email.split("@")[0];
+            }
 
             if (email == null || email.isBlank()) {
-                throw new IllegalArgumentException("Email not found in Google account");
+                req.setAttribute("error", "Google Account authentication details missing.");
+                req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
+                return;
             }
 
             if (name == null || name.isBlank()) {
                 name = email.split("@")[0];
             }
+
 
             User user = userDao.findByEmail(email);
             if (user == null) {
