@@ -62,6 +62,7 @@ com\shopsphere\rmi\InventoryRmiClient.class
 com\shopsphere\web\RequestLogFilter.class
 com\shopsphere\rmi\InventoryServiceImpl.class
 com\shopsphere\controller\RegisterServlet.class
+com\shopsphere\controller\GoogleLoginServlet.class
 com\shopsphere\service\CatalogAdminService.class
 com\shopsphere\security\LoginRateLimiter$Window.class
 com\shopsphere\controller\CouponServlet.class
