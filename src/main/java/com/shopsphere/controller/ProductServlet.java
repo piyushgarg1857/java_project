@@ -19,10 +19,13 @@ public class ProductServlet extends HttpServlet {
         int category = parse(req.getParameter("category"), 0);
         int page = parse(req.getParameter("page"), 1);
         String sort = req.getParameter("sort");
+        Double minPrice = parseDouble(req.getParameter("minPrice"));
+        Double maxPrice = parseDouble(req.getParameter("maxPrice"));
+        boolean inStock = "1".equals(req.getParameter("inStock")) || "true".equalsIgnoreCase(req.getParameter("inStock"));
 
         List<Product> products = null;
         try {
-            products = dao.search(q, category, sort, page, 12);
+            products = dao.search(q, category, minPrice, maxPrice, inStock, sort, page, 12);
         } catch (Exception e) {
             e.printStackTrace();
             try {
@@ -37,13 +40,31 @@ public class ProductServlet extends HttpServlet {
             products = Collections.emptyList();
         }
 
+        List<String[]> categoriesList = Collections.emptyList();
+        try {
+            categoriesList = new com.shopsphere.dao.CategoryDAO().findAll();
+        } catch (Exception ignored) {}
+
         req.setAttribute("products", products);
+        req.setAttribute("categories", categoriesList);
         req.setAttribute("query", q == null ? "" : q);
         req.setAttribute("category", category);
+        req.setAttribute("minPrice", minPrice == null ? "" : minPrice);
+        req.setAttribute("maxPrice", maxPrice == null ? "" : maxPrice);
+        req.setAttribute("inStock", inStock);
         req.setAttribute("sort", sort == null ? "newest" : sort);
         req.setAttribute("page", page);
         req.getRequestDispatcher("/WEB-INF/views/products.jsp").forward(req, resp);
     }
+
+    private Double parseDouble(String v) {
+        try {
+            return (v != null && !v.isBlank()) ? Double.parseDouble(v) : null;
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
 
     private int parse(String v, int fallback) {
         try {
