@@ -66,6 +66,7 @@ public class CheckoutServlet extends HttpServlet {
                 p.sendRedirect(r.getContextPath() + "/checkout");
                 return;
             }
+
             String address; String city; String state; String pincode;
             String addressIdParam = r.getParameter("addressId");
             if (addressIdParam != null && !addressIdParam.isBlank()) {
@@ -79,14 +80,20 @@ public class CheckoutServlet extends HttpServlet {
                 state = InputValidator.maxLength(InputValidator.required(r.getParameter("state"), "State"), "State", 100);
                 pincode = InputValidator.pincode(r.getParameter("pincode"));
             }
+
+            String paymentMethod = r.getParameter("paymentMethod");
+            if (paymentMethod == null || paymentMethod.isBlank()) paymentMethod = "COD";
+
+            String paymentStatus = "RAZORPAY".equalsIgnoreCase(paymentMethod) || "ONLINE".equalsIgnoreCase(paymentMethod) ? "SUCCESS" : "PENDING";
+
             Coupon c = (Coupon) session.getAttribute("checkoutCoupon");
             String code = c == null ? null : c.getCode();
-            int id = service.placeOrder(u.getUserId(), address, city, state, pincode, code);
+
+            int id = service.placeOrder(u.getUserId(), address, city, state, pincode, code, paymentMethod, paymentStatus);
             double cartTotal = service.cartTotal(u.getUserId());
-            
+
             // Asynchronous Email Notification
             com.shopsphere.service.EmailService.sendOrderReceiptAsync(u.getEmail(), u.getName(), id, cartTotal);
-
 
             session.removeAttribute("checkoutCoupon");
             session.setAttribute("checkoutMessage", null);

@@ -9,6 +9,7 @@ D:\java_project\java_project\src\main\java\com\shopsphere\controller\CartServlet
 D:\java_project\java_project\src\main\java\com\shopsphere\controller\CheckoutServlet.java
 D:\java_project\java_project\src\main\java\com\shopsphere\controller\CouponServlet.java
 D:\java_project\java_project\src\main\java\com\shopsphere\controller\ErrorServlet.java
+D:\java_project\java_project\src\main\java\com\shopsphere\controller\ForgotPasswordServlet.java
 D:\java_project\java_project\src\main\java\com\shopsphere\controller\GoogleLoginServlet.java
 D:\java_project\java_project\src\main\java\com\shopsphere\controller\GoogleOAuthServlet.java
 D:\java_project\java_project\src\main\java\com\shopsphere\controller\LoginServlet.java

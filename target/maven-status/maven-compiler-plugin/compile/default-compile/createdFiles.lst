@@ -80,6 +80,7 @@ com\shopsphere\web\AdminOrderServlet.class
 com\shopsphere\dao\WishlistDAO.class
 com\shopsphere\dao\AdminAnalyticsDAO.class
 com\shopsphere\controller\AdminUserServlet.class
+com\shopsphere\controller\ForgotPasswordServlet.class
 com\shopsphere\controller\PaymentServlet.class
 com\shopsphere\dao\ReviewDAO.class
 com\shopsphere\i18n\I18nDemo.class

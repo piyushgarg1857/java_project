@@ -30,6 +30,10 @@
             <div class="alert success" style="margin-top:16px;">Registration successful. Please sign in.</div>
         <% } %>
 
+        <% if ("true".equals(request.getParameter("reset"))) { %>
+            <div class="alert success" style="margin-top:16px;">Password reset successfully! Please sign in with your new password.</div>
+        <% } %>
+
         <!-- Real Google OAuth Section -->
         <div style="margin-top:24px;">
             <a href="<%= ctx %>/google-oauth" class="google-btn">
@@ -51,7 +55,10 @@
                 <input type="email" name="email" autocomplete="email" required placeholder="you@example.com">
             </div>
             <div class="field">
-                <label>Password</label>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <label>Password</label>
+                    <a href="<%= ctx %>/forgot-password" style="font-size:11px; color:var(--accent); text-decoration:none;">Forgot Password?</a>
+                </div>
                 <input type="password" name="password" autocomplete="current-password" required placeholder="••••••••">
             </div>
             <button type="submit" style="width:100%">Sign in</button>
