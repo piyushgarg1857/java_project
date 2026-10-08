@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.util.Collections;
 
 @WebServlet("/admin/categories")
 public class AdminCategoryServlet extends HttpServlet {
@@ -21,14 +22,16 @@ public class AdminCategoryServlet extends HttpServlet {
                 }
             }
             req.setAttribute("categories", service.categories());
-            req.getRequestDispatcher("/WEB-INF/views/admin/categories.jsp").forward(req, resp);
         } catch (Exception e) {
-            throw new ServletException("Unable to load categories", e);
+            e.printStackTrace();
+            req.setAttribute("categories", Collections.emptyList());
+            req.setAttribute("error", "Failed to load categories: " + e.getMessage());
         }
+        req.getRequestDispatcher("/WEB-INF/views/admin/categories.jsp").forward(req, resp);
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             String action = req.getParameter("action");
             if ("update".equals(action)) {
@@ -51,7 +54,10 @@ public class AdminCategoryServlet extends HttpServlet {
             }
             resp.sendRedirect(req.getContextPath() + "/admin/categories");
         } catch (Exception e) {
-            throw new IOException("Category operation failed", e);
+            e.printStackTrace();
+            req.setAttribute("categories", Collections.emptyList());
+            req.setAttribute("error", "Category operation failed: " + e.getMessage());
+            req.getRequestDispatcher("/WEB-INF/views/admin/categories.jsp").forward(req, resp);
         }
     }
 }

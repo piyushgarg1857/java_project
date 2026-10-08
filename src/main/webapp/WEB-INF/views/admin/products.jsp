@@ -52,7 +52,7 @@
                     <div class="field">
                         <label>Category</label>
                         <select name="categoryId" required>
-                            <% if (categories != null) { for (String[] c : categories) { if ("true".equals(c[3])) { %>
+                            <% if (categories != null) { for (String[] c : categories) { boolean isActive = c.length > 4 ? "true".equalsIgnoreCase(c[4]) : (c.length > 3 ? "true".equalsIgnoreCase(c[3]) : true); if (isActive) { %>
                             <option value="<%= c[0] %>" <%= (isEdit && Integer.toString(editProduct.getCategoryId()).equals(c[0])) ? "selected" : "" %>><%= c[1] %></option>
                             <% } } } %>
                         </select>
