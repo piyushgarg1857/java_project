@@ -28,7 +28,7 @@ public class OrderDetailServlet extends HttpServlet {
             }
             q.setAttribute("order", order);
             q.setAttribute("items", dao.findItems(u.getUserId(), id));
-            q.getRequestDispatcher("/order-detail.jsp").forward(q, p);
+            q.getRequestDispatcher("/WEB-INF/views/order-detail.jsp").forward(q, p);
         } catch (NumberFormatException e) {
             p.sendError(400, "Invalid order id");
         } catch (Exception e) {
