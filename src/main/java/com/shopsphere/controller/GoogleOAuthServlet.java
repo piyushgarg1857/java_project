@@ -9,6 +9,7 @@ import jakarta.servlet.http.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -22,120 +23,135 @@ public class GoogleOAuthServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(GoogleOAuthServlet.class.getName());
     private final UserDAO userDao = new UserDAO();
 
-    private static final String CLIENT_ID = System.getenv().getOrDefault(
-        "GOOGLE_CLIENT_ID", "849204910294-shopsphere-google-oauth.apps.googleusercontent.com"
-    );
+    // Read credentials strictly from Environment Variables / Azure App Settings
+    private String getClientId() {
+        String cid = System.getenv("GOOGLE_CLIENT_ID");
+        if (cid != null && !cid.isBlank()) return cid.trim();
+        return System.getProperty("GOOGLE_CLIENT_ID", "");
+    }
+
+    private String getClientSecret() {
+        String cs = System.getenv("GOOGLE_CLIENT_SECRET");
+        if (cs != null && !cs.isBlank()) return cs.trim();
+        return System.getProperty("GOOGLE_CLIENT_SECRET", "");
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String servletPath = req.getServletPath();
 
-        if ("/google-oauth".equals(servletPath)) {
-            // Determine dynamic redirect URI
-            String scheme = req.getScheme();
-            String serverName = req.getServerName();
-            int port = req.getServerPort();
-            String contextPath = req.getContextPath();
+        String clientId = getClientId();
+        String clientSecret = getClientSecret();
 
-            String redirectUri;
-            if ("localhost".equalsIgnoreCase(serverName) || "127.0.0.1".equals(serverName)) {
-                redirectUri = scheme + "://" + serverName + (port != 80 && port != 443 ? ":" + port : "") + contextPath + "/google-callback";
-            } else {
-                redirectUri = "https://" + serverName + contextPath + "/google-callback";
+        if ("/google-oauth".equals(servletPath)) {
+            if (clientId.isBlank()) {
+                LOGGER.warning("[GOOGLE OAUTH ERROR] GOOGLE_CLIENT_ID environment variable is missing.");
+                req.setAttribute("error", "Google OAuth credentials are not configured on server.");
+                req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
+                return;
             }
 
+            String redirectUri = getRedirectUri(req);
             String googleAuthUrl = "https://accounts.google.com/o/oauth2/v2/auth"
-                + "?client_id=" + URLEncoder.encode(CLIENT_ID, StandardCharsets.UTF_8)
+                + "?client_id=" + URLEncoder.encode(clientId, StandardCharsets.UTF_8)
                 + "&redirect_uri=" + URLEncoder.encode(redirectUri, StandardCharsets.UTF_8)
-                + "&response_type=token"
+                + "&response_type=code"
                 + "&scope=" + URLEncoder.encode("openid email profile", StandardCharsets.UTF_8)
                 + "&prompt=select_account";
 
-            LOGGER.info("[GOOGLE OAUTH REDIRECT] Redirecting user to Google Account Selection screen...");
+            LOGGER.info("[GOOGLE OAUTH REDIRECT] Redirecting user to Google Auth: " + googleAuthUrl);
             resp.sendRedirect(googleAuthUrl);
             return;
         }
 
         if ("/google-callback".equals(servletPath)) {
-            // Handle OAuth2 Implicit Flow hash fragment or access token
-            String accessToken = req.getParameter("access_token");
-            String email = req.getParameter("email");
-            String name = req.getParameter("name");
+            String code = req.getParameter("code");
+            String error = req.getParameter("error");
 
-            if (accessToken != null && !accessToken.isBlank()) {
-                // Fetch profile directly from Google UserInfo API
-                String[] googleProfile = fetchGoogleUserInfo(accessToken);
-                if (googleProfile != null) {
-                    email = googleProfile[0];
-                    name = googleProfile[1];
-                }
-            }
-
-            // If token in URL hash fragment on client-side, return HTML token reader
-            if (email == null || email.isBlank()) {
-                resp.setContentType("text/html;charset=UTF-8");
-                resp.getWriter().write(buildCallbackClientHtml(req.getContextPath()));
+            if (error != null || code == null || code.isBlank()) {
+                LOGGER.warning("[GOOGLE OAUTH CALLBACK ERROR] Code missing or user cancelled: " + error);
+                req.setAttribute("error", "Google authentication was cancelled or failed.");
+                req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
                 return;
             }
 
+            String redirectUri = getRedirectUri(req);
+            String accessToken = exchangeCodeForAccessToken(code, redirectUri, clientId, clientSecret);
+
+            if (accessToken == null || accessToken.isBlank()) {
+                LOGGER.warning("[GOOGLE OAUTH CALLBACK ERROR] Failed to exchange auth code for access token.");
+                req.setAttribute("error", "Google authentication failed (Token exchange error).");
+                req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
+                return;
+            }
+
+            String[] googleProfile = fetchGoogleUserInfo(accessToken);
+            if (googleProfile == null || googleProfile[0] == null || googleProfile[0].isBlank()) {
+                LOGGER.warning("[GOOGLE OAUTH CALLBACK ERROR] Failed to fetch profile from Google.");
+                req.setAttribute("error", "Google authentication failed (Profile fetch error).");
+                req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
+                return;
+            }
+
+            String email = googleProfile[0];
+            String name = googleProfile[1];
+
             processGoogleLogin(email, name, req, resp);
         }
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String email = req.getParameter("email");
-        String name = req.getParameter("name");
-        String accessToken = req.getParameter("access_token");
+    private String getRedirectUri(HttpServletRequest req) {
+        String serverName = req.getServerName();
+        String contextPath = req.getContextPath();
+        if (contextPath == null) contextPath = "";
 
-        if (accessToken != null && !accessToken.isBlank()) {
-            String[] profile = fetchGoogleUserInfo(accessToken);
-            if (profile != null) {
-                email = profile[0];
-                name = profile[1];
-            }
-        }
-
-        if (email != null && !email.isBlank()) {
-            processGoogleLogin(email, name, req, resp);
+        if ("localhost".equalsIgnoreCase(serverName) || "127.0.0.1".equals(serverName)) {
+            int port = req.getServerPort();
+            return "http://" + serverName + (port != 80 && port != 443 ? ":" + port : "") + contextPath + "/google-callback";
         } else {
-            resp.sendRedirect(req.getContextPath() + "/login");
+            return "https://" + serverName + contextPath + "/google-callback";
         }
     }
 
-    private void processGoogleLogin(String email, String name, HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+    private String exchangeCodeForAccessToken(String code, String redirectUri, String clientId, String clientSecret) {
         try {
-            email = email.trim().toLowerCase();
-            if (name == null || name.isBlank()) {
-                name = email.split("@")[0];
+            URL url = new URL("https://oauth2.googleapis.com/token");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.setDoOutput(true);
+
+            String postParams = "code=" + URLEncoder.encode(code, StandardCharsets.UTF_8)
+                + "&client_id=" + URLEncoder.encode(clientId, StandardCharsets.UTF_8)
+                + "&client_secret=" + URLEncoder.encode(clientSecret, StandardCharsets.UTF_8)
+                + "&redirect_uri=" + URLEncoder.encode(redirectUri, StandardCharsets.UTF_8)
+                + "&grant_type=authorization_code";
+
+            try (OutputStream os = conn.getOutputStream()) {
+                byte[] input = postParams.getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
             }
 
-            User user = userDao.findByEmail(email);
-            if (user == null) {
-                user = new User();
-                user.setName(name);
-                user.setEmail(email);
-                user.setPassword(PasswordUtil.hash("G_OAUTH_" + UUID.randomUUID().toString()));
-                user.setMobile("");
-                user.setRole("CUSTOMER");
-                user.setStatus(true);
-
-                userDao.create(user);
-                user = userDao.findByEmail(email);
-
-                com.shopsphere.service.EmailService.sendOrderReceiptAsync(email, name, 0, 0.0);
+            int responseCode = conn.getResponseCode();
+            if (responseCode == 200) {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+                    StringBuilder json = new StringBuilder();
+                    String line;
+                    while ((line = br.readLine()) != null) json.append(line);
+                    return extractJsonField(json.toString(), "access_token");
+                }
+            } else {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getErrorStream(), StandardCharsets.UTF_8))) {
+                    StringBuilder json = new StringBuilder();
+                    String line;
+                    while ((line = br.readLine()) != null) json.append(line);
+                    LOGGER.warning("[GOOGLE TOKEN EXCHANGE FAIL] Response: " + responseCode + " - " + json);
+                }
             }
-
-            HttpSession session = req.getSession(true);
-            session.setAttribute("loggedInUser", user);
-            LOGGER.info("[GOOGLE OAUTH SUCCESS] User logged in: " + email);
-
-            resp.sendRedirect(req.getContextPath() + "/");
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Google login error", e);
-            req.setAttribute("error", "Google authentication failed.");
-            req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
+            LOGGER.log(Level.WARNING, "Exception during Google token exchange", e);
         }
+        return null;
     }
 
     private String[] fetchGoogleUserInfo(String accessToken) {
@@ -177,24 +193,38 @@ public class GoogleOAuthServlet extends HttpServlet {
         return json.substring(start, end).trim();
     }
 
-    private String buildCallbackClientHtml(String contextPath) {
-        return "<!doctype html><html><head><title>Google Sign-In Callback</title></head><body>"
-             + "<p style='font-family:sans-serif; text-align:center; margin-top:50px;'>Connecting to Google Account...</p>"
-             + "<form id='cbForm' method='post' action='" + contextPath + "/google-callback'>"
-             + "<input type='hidden' name='access_token' id='atInput'>"
-             + "<input type='hidden' name='email' id='emailInput'>"
-             + "<input type='hidden' name='name' id='nameInput'>"
-             + "</form>"
-             + "<script>"
-             + "var hash = window.location.hash.substring(1);"
-             + "var params = new URLSearchParams(hash);"
-             + "var token = params.get('access_token');"
-             + "if (token) {"
-             + "  document.getElementById('atInput').value = token;"
-             + "  document.getElementById('cbForm').submit();"
-             + "} else {"
-             + "  window.location.href = '" + contextPath + "/login';"
-             + "}"
-             + "</script></body></html>";
+    private void processGoogleLogin(String email, String name, HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+        try {
+            email = email.trim().toLowerCase();
+            if (name == null || name.isBlank()) {
+                name = email.split("@")[0];
+            }
+
+            User user = userDao.findByEmail(email);
+            if (user == null) {
+                user = new User();
+                user.setName(name);
+                user.setEmail(email);
+                user.setPassword(PasswordUtil.hash("G_OAUTH_" + UUID.randomUUID().toString()));
+                user.setMobile("");
+                user.setRole("CUSTOMER");
+                user.setStatus(true);
+
+                userDao.create(user);
+                user = userDao.findByEmail(email);
+
+                com.shopsphere.service.EmailService.sendOrderReceiptAsync(email, name, 0, 0.0);
+            }
+
+            HttpSession session = req.getSession(true);
+            session.setAttribute("loggedInUser", user);
+            LOGGER.info("[GOOGLE OAUTH VERIFIED SUCCESS] User logged in: " + email);
+
+            resp.sendRedirect(req.getContextPath() + "/");
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Google login error", e);
+            req.setAttribute("error", "Google authentication failed.");
+            req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
+        }
     }
 }
