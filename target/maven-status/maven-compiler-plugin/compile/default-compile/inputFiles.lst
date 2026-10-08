@@ -70,6 +70,7 @@ D:\java_project\java_project\src\main\java\com\shopsphere\service\AuthService.ja
 D:\java_project\java_project\src\main\java\com\shopsphere\service\CartService.java
 D:\java_project\java_project\src\main\java\com\shopsphere\service\CatalogAdminService.java
 D:\java_project\java_project\src\main\java\com\shopsphere\service\CouponService.java
+D:\java_project\java_project\src\main\java\com\shopsphere\service\EmailService.java
 D:\java_project\java_project\src\main\java\com\shopsphere\service\OrderService.java
 D:\java_project\java_project\src\main\java\com\shopsphere\service\ProductService.java
 D:\java_project\java_project\src\main\java\com\shopsphere\util\PasswordUtil.java

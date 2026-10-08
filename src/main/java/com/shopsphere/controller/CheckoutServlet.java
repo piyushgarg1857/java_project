@@ -82,10 +82,17 @@ public class CheckoutServlet extends HttpServlet {
             Coupon c = (Coupon) session.getAttribute("checkoutCoupon");
             String code = c == null ? null : c.getCode();
             int id = service.placeOrder(u.getUserId(), address, city, state, pincode, code);
+            double cartTotal = service.cartTotal(u.getUserId());
+            
+            // Asynchronous Email Notification
+            com.shopsphere.service.EmailService.sendOrderReceiptAsync(u.getEmail(), u.getName(), id, cartTotal);
+
+
             session.removeAttribute("checkoutCoupon");
             session.setAttribute("checkoutMessage", null);
             r.setAttribute("orderId", id);
             r.getRequestDispatcher("/WEB-INF/views/order-success.jsp").forward(r, p);
+
         } catch (IllegalArgumentException e) {
             session.setAttribute("checkoutMessage", e.getMessage());
             p.sendRedirect(r.getContextPath() + "/checkout");
