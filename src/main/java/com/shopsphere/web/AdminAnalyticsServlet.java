@@ -1,3 +1,27 @@
 package com.shopsphere.web;
-import com.shopsphere.dao.AdminAnalyticsDAO;import jakarta.servlet.*;import jakarta.servlet.annotation.WebServlet;import jakarta.servlet.http.*;import java.io.IOException;
-@WebServlet("/admin/analytics") public class AdminAnalyticsServlet extends HttpServlet{private final AdminAnalyticsDAO dao=new AdminAnalyticsDAO();protected void doGet(HttpServletRequest q,HttpServletResponse p)throws ServletException,IOException{try{q.setAttribute("summary",dao.summary());q.setAttribute("daily",dao.recentOrders());q.getRequestDispatcher("/WEB-INF/views/admin/analytics.jsp").forward(q,p);}catch(Exception e){throw new ServletException("Unable to load analytics",e);}}}
+
+import com.shopsphere.dao.AdminAnalyticsDAO;
+import jakarta.servlet.*;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+import java.util.Collections;
+
+@WebServlet("/admin/analytics")
+public class AdminAnalyticsServlet extends HttpServlet {
+    private final AdminAnalyticsDAO dao = new AdminAnalyticsDAO();
+
+    @Override
+    protected void doGet(HttpServletRequest q, HttpServletResponse p) throws ServletException, IOException {
+        try {
+            q.setAttribute("summary", dao.summary());
+            q.setAttribute("daily", dao.recentOrders());
+        } catch (Exception e) {
+            e.printStackTrace();
+            q.setAttribute("summary", Collections.emptyMap());
+            q.setAttribute("daily", Collections.emptyList());
+            q.setAttribute("error", "Failed to load analytics: " + e.getMessage());
+        }
+        q.getRequestDispatcher("/WEB-INF/views/admin/analytics.jsp").forward(q, p);
+    }
+}

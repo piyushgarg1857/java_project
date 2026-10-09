@@ -104,10 +104,28 @@ public class CheckoutServlet extends HttpServlet {
             String code = c == null ? null : c.getCode();
 
             int id = service.placeOrder(u.getUserId(), address, city, state, pincode, code, paymentMethod, paymentStatus);
-            double cartTotal = service.cartTotal(u.getUserId());
 
-            // Asynchronous Email Notification
-            com.shopsphere.service.EmailService.sendOrderReceiptAsync(u.getEmail(), u.getName(), id, cartTotal);
+            // Fetch created order details & items for exact invoice email generation
+            try {
+                com.shopsphere.dao.OrderDetailDAO detailDAO = new com.shopsphere.dao.OrderDetailDAO();
+                java.util.Map<String, Object> orderMap = detailDAO.findOrder(u.getUserId(), id);
+                java.util.List<java.util.Map<String, Object>> itemsList = detailDAO.findItems(u.getUserId(), id);
+
+                double billedTotal = 0.0;
+                String fullAddr = address + ", " + city + ", " + state + " - " + pincode;
+                String payMethod = paymentMethod;
+
+                if (orderMap != null) {
+                    Object totObj = orderMap.get("totalAmount");
+                    if (totObj != null) billedTotal = Double.parseDouble(String.valueOf(totObj));
+                    if (orderMap.get("shippingAddress") != null) fullAddr = String.valueOf(orderMap.get("shippingAddress"));
+                    if (orderMap.get("paymentMethod") != null) payMethod = String.valueOf(orderMap.get("paymentMethod"));
+                }
+
+                com.shopsphere.service.EmailService.sendOrderReceiptAsync(u.getEmail(), u.getName(), id, billedTotal, payMethod, fullAddr, itemsList);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
 
             session.removeAttribute("checkoutCoupon");
             session.setAttribute("checkoutMessage", null);

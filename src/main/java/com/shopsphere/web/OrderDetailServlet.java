@@ -20,19 +20,45 @@ public class OrderDetailServlet extends HttpServlet {
             return;
         }
         try {
-            int id = Integer.parseInt(q.getParameter("orderId"));
-            var order = dao.findOrder(u.getUserId(), id);
-            if (order == null) {
-                p.sendError(404, "Order not found");
+            String idParam = q.getParameter("orderId");
+            if (idParam == null || idParam.isBlank()) {
+                p.sendRedirect(q.getContextPath() + "/orders");
                 return;
             }
+            int id = Integer.parseInt(idParam);
+            var order = dao.findOrder(u.getUserId(), id);
+            if (order == null) {
+                // If not found by user, check if admin is viewing or redirect
+                if ("ADMIN".equalsIgnoreCase(u.getRole())) {
+                    // Fetch for admin
+                    try (java.sql.Connection c = com.shopsphere.config.DBConnection.getConnection();
+                         java.sql.PreparedStatement st = c.prepareStatement("SELECT user_id FROM orders WHERE order_id=?")) {
+                        st.setInt(1, id);
+                        try (java.sql.ResultSet r = st.executeQuery()) {
+                            if (r.next()) {
+                                int ownerId = r.getInt(1);
+                                order = dao.findOrder(ownerId, id);
+                                q.setAttribute("items", dao.findItems(ownerId, id));
+                            }
+                        }
+                    }
+                }
+            } else {
+                q.setAttribute("items", dao.findItems(u.getUserId(), id));
+            }
+
+            if (order == null) {
+                q.getSession().setAttribute("error", "Order #" + id + " was not found.");
+                p.sendRedirect(q.getContextPath() + "/orders");
+                return;
+            }
+
             q.setAttribute("order", order);
-            q.setAttribute("items", dao.findItems(u.getUserId(), id));
             q.getRequestDispatcher("/WEB-INF/views/order-detail.jsp").forward(q, p);
-        } catch (NumberFormatException e) {
-            p.sendError(400, "Invalid order id");
         } catch (Exception e) {
-            throw new ServletException("Unable to load order detail", e);
+            e.printStackTrace();
+            q.getSession().setAttribute("error", "Unable to load order details.");
+            p.sendRedirect(q.getContextPath() + "/orders");
         }
     }
 }

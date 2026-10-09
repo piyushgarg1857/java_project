@@ -6,6 +6,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.util.Collections;
 
 @WebServlet("/orders")
 public class OrdersServlet extends HttpServlet {
@@ -21,9 +22,11 @@ public class OrdersServlet extends HttpServlet {
         }
         try {
             r.setAttribute("orders", dao.findByUser(u.getUserId()));
-            r.getRequestDispatcher("/WEB-INF/views/orders.jsp").forward(r, p);
         } catch (Exception e) {
-            throw new ServletException("Unable to load orders", e);
+            e.printStackTrace();
+            r.setAttribute("orders", Collections.emptyList());
+            r.setAttribute("error", "Unable to load order history: " + e.getMessage());
         }
+        r.getRequestDispatcher("/WEB-INF/views/orders.jsp").forward(r, p);
     }
 }
