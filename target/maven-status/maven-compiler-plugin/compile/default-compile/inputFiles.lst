@@ -84,6 +84,7 @@ D:\java_project\java_project\src\main\java\com\shopsphere\web\AdminReviewServlet
 D:\java_project\java_project\src\main\java\com\shopsphere\web\CorrelationIdFilter.java
 D:\java_project\java_project\src\main\java\com\shopsphere\web\HealthServlet.java
 D:\java_project\java_project\src\main\java\com\shopsphere\web\I18nServlet.java
+D:\java_project\java_project\src\main\java\com\shopsphere\web\InvoiceServlet.java
 D:\java_project\java_project\src\main\java\com\shopsphere\web\OrderDetailServlet.java
 D:\java_project\java_project\src\main\java\com\shopsphere\web\PreferenceCookieServlet.java
 D:\java_project\java_project\src\main\java\com\shopsphere\web\RequestLogFilter.java

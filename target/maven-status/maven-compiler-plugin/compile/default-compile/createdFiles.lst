@@ -35,6 +35,7 @@ com\shopsphere\network\ShopSocketServer.class
 com\shopsphere\dao\AdminUserDAO.class
 com\shopsphere\web\HealthServlet.class
 com\shopsphere\controller\PasswordChangeServlet.class
+com\shopsphere\web\InvoiceServlet.class
 com\shopsphere\controller\ReviewServlet.class
 com\shopsphere\desktop\AdminDesktopApp.class
 com\shopsphere\web\CorrelationIdFilter.class
