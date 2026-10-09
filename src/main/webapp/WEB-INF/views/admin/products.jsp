@@ -86,6 +86,14 @@
                     <label>Description</label>
                     <textarea name="description" rows="3" placeholder="Product details..."><%= isEdit && editProduct.getDescription() != null ? editProduct.getDescription() : "" %></textarea>
                 </div>
+                <% if (isEdit) { %>
+                    <div class="field" style="margin-top:12px;">
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                            <input type="checkbox" name="status" value="true" <%= editProduct.isStatus() ? "checked" : "" %> style="accent-color:var(--accent,#d8c8a8); width:16px; height:16px;">
+                            <span style="font-size:13px; color:#f3efe7;">Product Active & Visible in Store</span>
+                        </label>
+                    </div>
+                <% } %>
                 <div style="display:flex; gap:12px; margin-top:16px;">
                     <button type="submit" class="btn"><%= isEdit ? "Save Product Changes" : "Create Product" %></button>
                     <% if (isEdit) { %>
@@ -130,10 +138,12 @@
                     <td><span class="chip <%= p.getStock() > 0 ? "success" : "danger" %>"><%= p.getStock() %> units</span></td>
                     <td><span class="chip <%= p.isStatus() ? "success" : "danger" %>"><%= p.isStatus() ? "Active" : "Disabled" %></span></td>
                     <td>
-                        <div class="product-actions" style="margin:0;">
-                            <a class="btn secondary" href="${pageContext.request.contextPath}/admin/products?action=edit&id=<%= p.getProductId() %>">Edit</a>
+                        <div class="product-actions" style="margin:0; display:flex; gap:6px;">
+                            <a class="btn secondary" style="padding:6px 12px; font-size:11px;" href="${pageContext.request.contextPath}/admin/products?action=edit&id=<%= p.getProductId() %>">Edit</a>
                             <% if (p.isStatus()) { %>
-                            <a class="btn danger" onclick="return confirm('Disable this product?')" href="${pageContext.request.contextPath}/admin/products?action=delete&id=<%= p.getProductId() %>">Disable</a>
+                                <a class="btn danger" style="padding:6px 12px; font-size:11px;" onclick="return confirm('Disable this product?')" href="${pageContext.request.contextPath}/admin/products?action=toggle&id=<%= p.getProductId() %>">Disable</a>
+                            <% } else { %>
+                                <a class="btn secondary" style="padding:6px 12px; font-size:11px; border-color:#81c784; color:#81c784;" onclick="return confirm('Enable this product?')" href="${pageContext.request.contextPath}/admin/products?action=toggle&id=<%= p.getProductId() %>">Enable</a>
                             <% } %>
                         </div>
                     </td>

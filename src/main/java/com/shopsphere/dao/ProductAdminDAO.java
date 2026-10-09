@@ -25,23 +25,29 @@ public class ProductAdminDAO {
     }
 
     public int create(Product p) throws SQLException {
-        String sql = "INSERT INTO products(category_id,name,brand,description,price,discount,stock,image_url,status) VALUES(?,?,?,?,?,?,?,?,TRUE)";
+        String sql = "INSERT INTO products(category_id,name,brand,description,price,discount,stock,image_url,status) VALUES(?,?,?,?,?,?,?,?,?)";
         try (Connection c = DBConnection.getConnection(); PreparedStatement s = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            bind(s, p); s.executeUpdate();
+            bind(s, p);
+            s.setBoolean(9, p.isStatus());
+            s.executeUpdate();
             try (ResultSet r = s.getGeneratedKeys()) { return r.next() ? r.getInt(1) : 0; }
         }
     }
 
     public boolean update(Product p) throws SQLException {
-        String sql = "UPDATE products SET category_id=?,name=?,brand=?,description=?,price=?,discount=?,stock=?,image_url=? WHERE product_id=?";
+        String sql = "UPDATE products SET category_id=?,name=?,brand=?,description=?,price=?,discount=?,stock=?,image_url=?,status=? WHERE product_id=?";
         try (Connection c = DBConnection.getConnection(); PreparedStatement s = c.prepareStatement(sql)) {
-            bind(s, p); s.setInt(9, p.getProductId()); return s.executeUpdate() == 1;
+            bind(s, p);
+            s.setBoolean(9, p.isStatus());
+            s.setInt(10, p.getProductId());
+            return s.executeUpdate() == 1;
         }
     }
 
     public boolean delete(int id) throws SQLException {
-        try (Connection c = DBConnection.getConnection(); PreparedStatement s = c.prepareStatement("UPDATE products SET status=FALSE WHERE product_id=?")) {
-            s.setInt(1, id); return s.executeUpdate() == 1;
+        try (Connection c = DBConnection.getConnection(); PreparedStatement s = c.prepareStatement("UPDATE products SET status = CASE WHEN status=TRUE THEN FALSE ELSE TRUE END WHERE product_id=?")) {
+            s.setInt(1, id);
+            return s.executeUpdate() == 1;
         }
     }
 
