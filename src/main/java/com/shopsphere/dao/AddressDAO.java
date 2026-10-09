@@ -25,20 +25,42 @@ public class AddressDAO {
 
     public List<Address> findByUser(int userId) throws SQLException {
         List<Address> out = new ArrayList<>();
-        String q = "SELECT address_id, user_id, address_line, city, state, pincode, address_type FROM addresses WHERE user_id=? ORDER BY address_id DESC";
-        try (Connection c = DBConnection.getConnection(); PreparedStatement s = c.prepareStatement(q)) {
-            s.setInt(1, userId);
-            try (ResultSet r = s.executeQuery()) {
-                while (r.next()) {
-                    Address a = new Address();
-                    a.setAddressId(r.getInt(1));
-                    a.setUserId(r.getInt(2));
-                    a.setAddressLine(r.getString(3));
-                    a.setCity(r.getString(4));
-                    a.setState(r.getString(5));
-                    a.setPincode(r.getString(6));
-                    a.setAddressType(r.getString(7));
-                    out.add(a);
+        String q = "SELECT address_id, user_id, address_line, city, state, pincode, address_type FROM addresses WHERE user_id=? AND (address_type IS NULL OR address_type != 'DELETED') ORDER BY address_id DESC";
+        String fallbackQ = "SELECT address_id, user_id, address_line, city, state, pincode, address_type FROM addresses WHERE user_id=? ORDER BY address_id DESC";
+
+        try (Connection c = DBConnection.getConnection()) {
+            try (PreparedStatement s = c.prepareStatement(q)) {
+                s.setInt(1, userId);
+                try (ResultSet r = s.executeQuery()) {
+                    while (r.next()) {
+                        Address a = new Address();
+                        a.setAddressId(r.getInt(1));
+                        a.setUserId(r.getInt(2));
+                        a.setAddressLine(r.getString(3));
+                        a.setCity(r.getString(4));
+                        a.setState(r.getString(5));
+                        a.setPincode(r.getString(6));
+                        a.setAddressType(r.getString(7));
+                        out.add(a);
+                    }
+                    return out;
+                }
+            } catch (SQLException sqle) {
+                try (PreparedStatement s = c.prepareStatement(fallbackQ)) {
+                    s.setInt(1, userId);
+                    try (ResultSet r = s.executeQuery()) {
+                        while (r.next()) {
+                            Address a = new Address();
+                            a.setAddressId(r.getInt(1));
+                            a.setUserId(r.getInt(2));
+                            a.setAddressLine(r.getString(3));
+                            a.setCity(r.getString(4));
+                            a.setState(r.getString(5));
+                            a.setPincode(r.getString(6));
+                            a.setAddressType(r.getString(7));
+                            out.add(a);
+                        }
+                    }
                 }
             }
         }
@@ -46,23 +68,47 @@ public class AddressDAO {
     }
 
     public Address findOwned(int userId, int addressId) throws SQLException {
-        String q = "SELECT address_id, user_id, address_line, city, state, pincode, address_type FROM addresses WHERE address_id=? AND user_id=?";
-        try (Connection c = DBConnection.getConnection(); PreparedStatement s = c.prepareStatement(q)) {
-            s.setInt(1, addressId);
-            s.setInt(2, userId);
-            try (ResultSet r = s.executeQuery()) {
-                if (!r.next()) return null;
-                Address a = new Address();
-                a.setAddressId(r.getInt(1));
-                a.setUserId(r.getInt(2));
-                a.setAddressLine(r.getString(3));
-                a.setCity(r.getString(4));
-                a.setState(r.getString(5));
-                a.setPincode(r.getString(6));
-                a.setAddressType(r.getString(7));
-                return a;
+        String q = "SELECT address_id, user_id, address_line, city, state, pincode, address_type FROM addresses WHERE address_id=? AND user_id=? AND (address_type IS NULL OR address_type != 'DELETED')";
+        String fallbackQ = "SELECT address_id, user_id, address_line, city, state, pincode, address_type FROM addresses WHERE address_id=? AND user_id=?";
+
+        try (Connection c = DBConnection.getConnection()) {
+            try (PreparedStatement s = c.prepareStatement(q)) {
+                s.setInt(1, addressId);
+                s.setInt(2, userId);
+                try (ResultSet r = s.executeQuery()) {
+                    if (r.next()) {
+                        Address a = new Address();
+                        a.setAddressId(r.getInt(1));
+                        a.setUserId(r.getInt(2));
+                        a.setAddressLine(r.getString(3));
+                        a.setCity(r.getString(4));
+                        a.setState(r.getString(5));
+                        a.setPincode(r.getString(6));
+                        a.setAddressType(r.getString(7));
+                        return a;
+                    }
+                }
+            } catch (SQLException sqle) {
+                try (PreparedStatement s = c.prepareStatement(fallbackQ)) {
+                    s.setInt(1, addressId);
+                    s.setInt(2, userId);
+                    try (ResultSet r = s.executeQuery()) {
+                        if (r.next()) {
+                            Address a = new Address();
+                            a.setAddressId(r.getInt(1));
+                            a.setUserId(r.getInt(2));
+                            a.setAddressLine(r.getString(3));
+                            a.setCity(r.getString(4));
+                            a.setState(r.getString(5));
+                            a.setPincode(r.getString(6));
+                            a.setAddressType(r.getString(7));
+                            return a;
+                        }
+                    }
+                }
             }
         }
+        return null;
     }
 
     public boolean delete(int userId, int addressId) throws SQLException {
@@ -74,20 +120,11 @@ public class AddressDAO {
                 int count = s.executeUpdate();
                 if (count > 0) return true;
             } catch (SQLException sqle) {
-                // 2. If Foreign Key constraint fails (referenced in orders), disassociate user_id to soft-delete from saved list
-                try (PreparedStatement s = c.prepareStatement("UPDATE addresses SET user_id=NULL WHERE address_id=? AND user_id=?")) {
+                // 2. If Foreign Key constraint fails (referenced in orders table), soft delete via address_type='DELETED'
+                try (PreparedStatement s = c.prepareStatement("UPDATE addresses SET address_type='DELETED' WHERE address_id=? AND user_id=?")) {
                     s.setInt(1, addressId);
                     s.setInt(2, userId);
-                    int count = s.executeUpdate();
-                    if (count > 0) return true;
-                } catch (SQLException sqle2) {
-                    // 3. Alternative fallback if user_id is NOT NULL
-                    try (PreparedStatement s = c.prepareStatement("UPDATE addresses SET user_id=? WHERE address_id=? AND user_id=?")) {
-                        s.setInt(1, -userId);
-                        s.setInt(2, addressId);
-                        s.setInt(3, userId);
-                        return s.executeUpdate() > 0;
-                    }
+                    return s.executeUpdate() > 0;
                 }
             }
         }
