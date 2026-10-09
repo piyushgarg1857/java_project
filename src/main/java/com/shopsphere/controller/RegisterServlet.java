@@ -29,6 +29,7 @@ public class RegisterServlet extends HttpServlet {
                 req.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(req,resp);
                 return;
             }
+            com.shopsphere.service.EmailService.sendWelcomeEmailAsync(email, name);
             resp.sendRedirect(req.getContextPath()+"/login?registered=true");
         } catch(IllegalArgumentException e) {
             req.setAttribute("error",e.getMessage());

@@ -50,6 +50,8 @@
         <div class="auth-divider"><span>OR SIGN IN WITH EMAIL</span></div>
 
         <form method="post" action="<%= ctx %>/login">
+    <input type="hidden" name="_csrf" value="${csrfToken}" />
+            
             <div class="field">
                 <label>Email</label>
                 <input type="email" name="email" autocomplete="email" required placeholder="you@example.com">

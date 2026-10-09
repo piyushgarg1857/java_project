@@ -47,6 +47,7 @@
             </h3>
 
             <form method="post" action="<%= ctx %>/admin/categories">
+    <input type="hidden" name="_csrf" value="${csrfToken}" />
                 <input type="hidden" name="action" value="<%= editCat != null ? "update" : "create" %>">
                 <% if (editCat != null) { %>
                     <input type="hidden" name="id" value="<%= editCat[0] %>">
@@ -118,6 +119,7 @@
                             <td style="display:flex; gap:8px;">
                                 <a href="<%= ctx %>/admin/categories?action=edit&id=<%= row[0] %>" class="btn secondary" style="padding:6px 12px; font-size:11px;">Edit</a>
                                 <form method="post" action="<%= ctx %>/admin/categories" style="display:inline;">
+    <input type="hidden" name="_csrf" value="${csrfToken}" />
                                     <input type="hidden" name="action" value="toggle">
                                     <input type="hidden" name="id" value="<%= row[0] %>">
                                     <button class="btn <%= isActive ? "danger" : "secondary" %>" style="padding:6px 12px; font-size:11px;" type="submit">

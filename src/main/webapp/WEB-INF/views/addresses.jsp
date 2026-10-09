@@ -60,6 +60,7 @@
         <section class="card">
             <h3 style="font-size:15px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--accent,#d8c8a8);">Add shipping address</h3>
             <form method="post" action="<%= ctx %>/addresses" style="margin-top:16px;">
+    <input type="hidden" name="_csrf" value="${csrfToken}" />
                 <div class="field"><label>Address Line</label><input name="addressLine" maxlength="255" required placeholder="Street address, apartment, suite"></div>
                 <div class="field"><label>City</label><input name="city" maxlength="100" required placeholder="City"></div>
                 <div class="field"><label>State</label><input name="state" maxlength="100" required placeholder="State"></div>
@@ -80,6 +81,7 @@
                         <div class="muted" style="margin-top:4px; font-size:13px;"><%= a.getCity() %>, <%= a.getState() %> — <strong><%= a.getPincode() %></strong></div>
                     </div>
                     <form method="post" action="<%= ctx %>/addresses" onsubmit="return confirm('Are you sure you want to delete this saved address?');">
+    <input type="hidden" name="_csrf" value="${csrfToken}" />
                         <input type="hidden" name="action" value="delete">
                         <input type="hidden" name="addressId" value="<%= a.getAddressId() %>">
                         <button class="btn danger" type="submit" style="padding:6px 14px; font-size:12px; cursor:pointer;">Delete</button>

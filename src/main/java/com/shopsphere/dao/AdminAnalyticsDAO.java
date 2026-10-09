@@ -48,4 +48,61 @@ public class AdminAnalyticsDAO {
         } catch (Exception ignored) {}
         return out;
     }
+
+    public Map<String, Integer> orderStatusDistribution() throws SQLException {
+        Map<String, Integer> map = new LinkedHashMap<>();
+        String q = "SELECT order_status, COUNT(*) FROM orders GROUP BY order_status";
+        try (Connection c = DBConnection.getConnection();
+             Statement s = c.createStatement();
+             ResultSet r = s.executeQuery(q)) {
+            while (r.next()) {
+                map.put(r.getString(1), r.getInt(2));
+            }
+        } catch (Exception ignored) {}
+        return map;
+    }
+
+    public List<Map<String, Object>> topSellingProducts() throws SQLException {
+        List<Map<String, Object>> list = new ArrayList<>();
+        String q = "SELECT p.product_id, p.name, p.brand, SUM(oi.quantity) as total_qty, SUM(oi.quantity * oi.price) as total_sales "
+                 + "FROM order_items oi JOIN products p ON p.product_id = oi.product_id "
+                 + "JOIN orders o ON o.order_id = oi.order_id WHERE o.order_status <> 'CANCELLED' "
+                 + "GROUP BY p.product_id, p.name, p.brand ORDER BY total_qty DESC LIMIT 5";
+        try (Connection c = DBConnection.getConnection();
+             Statement s = c.createStatement();
+             ResultSet r = s.executeQuery(q)) {
+            while (r.next()) {
+                Map<String, Object> m = new LinkedHashMap<>();
+                m.put("id", r.getInt(1));
+                m.put("name", r.getString(2));
+                m.put("brand", r.getString(3));
+                m.put("qty", r.getInt(4));
+                m.put("sales", r.getBigDecimal(5) != null ? r.getBigDecimal(5) : BigDecimal.ZERO);
+                list.add(m);
+            }
+        } catch (Exception ignored) {}
+        return list;
+    }
+
+    public List<Map<String, Object>> lowStockProducts(int threshold) throws SQLException {
+        List<Map<String, Object>> list = new ArrayList<>();
+        String q = "SELECT product_id, name, brand, stock, price, image_url FROM products WHERE stock <= ? AND status = TRUE ORDER BY stock ASC LIMIT 10";
+        try (Connection c = DBConnection.getConnection();
+             PreparedStatement s = c.prepareStatement(q)) {
+            s.setInt(1, threshold);
+            try (ResultSet r = s.executeQuery()) {
+                while (r.next()) {
+                    Map<String, Object> m = new LinkedHashMap<>();
+                    m.put("id", r.getInt(1));
+                    m.put("name", r.getString(2));
+                    m.put("brand", r.getString(3));
+                    m.put("stock", r.getInt(4));
+                    m.put("price", r.getDouble(5));
+                    m.put("imageUrl", r.getString(6));
+                    list.add(m);
+                }
+            }
+        } catch (Exception ignored) {}
+        return list;
+    }
 }

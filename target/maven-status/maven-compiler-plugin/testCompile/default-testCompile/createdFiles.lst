@@ -1,6 +1,0 @@
-com\shopsphere\admin\OrderStatusValidatorTest.class
-com\shopsphere\security\InputValidatorTest.class
-com\shopsphere\util\PasswordUtilTest.class
-com\shopsphere\security\PasswordPolicyTest.class
-com\shopsphere\service\CouponServiceTest.class
-com\shopsphere\security\LoginRateLimiterTest.class

@@ -36,7 +36,7 @@
             <section class="card">
                 <h3>Create Coupon</h3>
                 <form method="post" action="${pageContext.request.contextPath}/admin/coupons" style="margin-top:16px;">
-                    <div class="field"><label>Code</label><input name="code" placeholder="WELCOME10" required maxlength="50"></div>
+    <input type="hidden" name="_csrf" value="${csrfToken}" /><div class="field"><label>Code</label><input name="code" placeholder="WELCOME10" required maxlength="50"></div>
                     <div class="field"><label>Type</label><select name="discountType"><option value="PERCENT">Percentage (%)</option><option value="FIXED">Fixed amount (₹)</option></select></div>
                     <div class="field"><label>Discount value</label><input type="number" name="discountValue" min="0.01" step="0.01" required></div>
                     <div class="field"><label>Minimum order</label><input type="number" name="minimumOrder" min="0" step="0.01" value="0" required></div>
@@ -70,7 +70,7 @@
                                 <td><span class="chip ${c.status ? 'success' : 'danger'}">${c.status ? 'Active' : 'Disabled'}</span></td>
                                 <td>
                                     <form method="post" action="${pageContext.request.contextPath}/admin/coupons">
-                                        <input type="hidden" name="action" value="toggle">
+    <input type="hidden" name="_csrf" value="${csrfToken}" /><input type="hidden" name="action" value="toggle">
                                         <input type="hidden" name="id" value="${c.couponId}">
                                         <input type="hidden" name="status" value="${!c.status}">
                                         <button class="btn secondary" type="submit">${c.status ? 'Disable' : 'Enable'}</button>

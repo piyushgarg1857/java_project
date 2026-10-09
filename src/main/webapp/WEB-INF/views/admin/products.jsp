@@ -44,7 +44,7 @@
         <div class="card" style="margin-bottom:1.5rem">
             <h3><%= isEdit ? "Update Product: " + editProduct.getName() : "Add New Product" %></h3>
             <form method="post" action="${pageContext.request.contextPath}/admin/products" style="margin-top:16px;">
-                <input type="hidden" name="action" value="<%= isEdit ? "update" : "create" %>">
+    <input type="hidden" name="_csrf" value="${csrfToken}" /><input type="hidden" name="action" value="<%= isEdit ? "update" : "create" %>">
                 <% if (isEdit) { %>
                 <input type="hidden" name="productId" value="<%= editProduct.getProductId() %>">
                 <% } %>
@@ -103,9 +103,29 @@
             </form>
         </div>
 
-        <div class="toolbar">
+        <!-- Bulk Product Import via CSV (Feature #6) -->
+        <details class="card" style="margin-bottom:1.5rem; cursor:pointer;">
+            <summary style="font-weight:600; font-size:15px; color:#d8c8a8;">📦 Bulk Product CSV Import (Click to expand)</summary>
+            <form method="post" action="${pageContext.request.contextPath}/admin/products" style="margin-top:16px; cursor:default;">
+                <input type="hidden" name="_csrf" value="${csrfToken}" />
+                <input type="hidden" name="action" value="bulk_import">
+                <p class="muted" style="font-size:12px; margin-bottom:8px;">
+                    Paste comma-separated rows: <code>name, brand, category_id, price, discount, stock, description, image_url</code>.
+                    <a href="${pageContext.request.contextPath}/admin/export?type=template" target="_blank" style="color:#d8c8a8; margin-left:8px; text-decoration:underline;">⇩ Download Sample Template (.csv)</a>
+                </p>
+                <textarea name="csvData" rows="4" placeholder="Spatial Audio Pro,Sony,1,19999.00,10.0,30,Premium wireless noise cancelling headphones,https://images.unsplash.com/...&#10;Classic Leather Watch,Fossil,1,9500.00,0,15,Genuine leather minimalist watch,https://images.unsplash.com/..." style="width:100%; font-family:monospace; font-size:12px; background:#181818; border:1px solid #333; color:#fff; padding:10px; border-radius:6px;"></textarea>
+                <div style="margin-top:10px;">
+                    <button type="submit" class="btn secondary">Import Products from CSV</button>
+                </div>
+            </form>
+        </details>
+
+        <div class="toolbar" style="display:flex; justify-content:space-between; align-items:center;">
             <h2>Product Catalog (<%= products != null ? products.size() : 0 %>)</h2>
-            <input class="search" data-search="#adminProducts" placeholder="Search products by name or brand...">
+            <div style="display:flex; gap:10px;">
+                <a href="${pageContext.request.contextPath}/admin/export?type=products" class="btn secondary" style="font-size:12px; padding:6px 12px;">⇩ Export Inventory CSV</a>
+                <input class="search" data-search="#adminProducts" placeholder="Search products by name or brand..." style="min-width:240px;">
+            </div>
         </div>
         <div id="adminProducts" class="table-wrap">
             <table>

@@ -16,9 +16,13 @@ public class SecurityHeadersFilter implements Filter {
         http.setHeader("X-Frame-Options", "DENY");
         http.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
         http.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+        http.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
         http.setHeader("Content-Security-Policy",
-                "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; " +
-                "img-src 'self' data: https:; font-src 'self' data:; form-action 'self'; frame-ancestors 'none'; base-uri 'self'");
+                "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+                "script-src 'self' 'unsafe-inline' https://checkout.razorpay.com https://cdn.jsdelivr.net; " +
+                "img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; " +
+                "connect-src 'self' https://api.razorpay.com https://lux-checkout.razorpay.com; " +
+                "frame-src https://api.razorpay.com; form-action 'self'; frame-ancestors 'none'; base-uri 'self'");
         chain.doFilter(request, response);
     }
 }

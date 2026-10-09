@@ -19,7 +19,7 @@ public class CheckoutServlet extends HttpServlet {
     private String getRazorpayKeyId() {
         String key = System.getenv("RAZORPAY_KEY_ID");
         if (key != null && !key.isBlank()) return key.trim();
-        return "rzp_test_TlXJYK6hDkOsvX";
+        return ""; // Must be configured via environment variable
     }
 
     private User user(HttpServletRequest r) {

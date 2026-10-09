@@ -30,6 +30,8 @@ public class LoginServlet extends HttpServlet {
                 req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req,resp);
                 return;
             }
+            HttpSession oldSession = req.getSession(false);
+            if (oldSession != null) oldSession.invalidate();
             req.getSession(true).setAttribute("loggedInUser",user);
             resp.sendRedirect(req.getContextPath()+"/products");
         } catch(IllegalArgumentException e) {

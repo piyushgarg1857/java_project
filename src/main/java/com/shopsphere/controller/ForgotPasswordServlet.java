@@ -28,6 +28,13 @@ public class ForgotPasswordServlet extends HttpServlet {
 
         if ("send-otp".equals(action)) {
             String email = req.getParameter("email");
+            // Rate limit OTP requests (reuse LoginRateLimiter — 5 per minute per IP)
+            String otpRateKey = "otp|" + req.getRemoteAddr();
+            if (!com.shopsphere.security.LoginRateLimiter.allow(otpRateKey)) {
+                req.setAttribute("error", "Too many OTP requests. Please wait a minute before trying again.");
+                req.getRequestDispatcher("/WEB-INF/views/forgot-password.jsp").forward(req, resp);
+                return;
+            }
             if (email == null || email.isBlank()) {
                 req.setAttribute("error", "Please enter a valid email address.");
                 req.getRequestDispatcher("/WEB-INF/views/forgot-password.jsp").forward(req, resp);
@@ -43,7 +50,7 @@ public class ForgotPasswordServlet extends HttpServlet {
                     return;
                 }
 
-                String otp = String.format("%06d", new Random().nextInt(900000) + 100000);
+                String otp = String.format("%06d", new java.security.SecureRandom().nextInt(900000) + 100000);
                 session.setAttribute("resetEmail", email);
                 session.setAttribute("resetOtp", otp);
                 session.setAttribute("resetOtpTime", System.currentTimeMillis());

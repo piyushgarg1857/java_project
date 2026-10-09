@@ -61,4 +61,31 @@ public class OrderDetailServlet extends HttpServlet {
             p.sendRedirect(q.getContextPath() + "/orders");
         }
     }
+
+    @Override
+    protected void doPost(HttpServletRequest q, HttpServletResponse p) throws ServletException, IOException {
+        HttpSession s = q.getSession(false);
+        User u = s == null ? null : (User) s.getAttribute("loggedInUser");
+        if (u == null) {
+            p.sendRedirect(q.getContextPath() + "/login");
+            return;
+        }
+        try {
+            String action = q.getParameter("action");
+            int orderId = Integer.parseInt(q.getParameter("orderId"));
+            String reason = q.getParameter("reason");
+            if ("return_request".equals(action)) {
+                boolean success = dao.requestReturn(u.getUserId(), orderId, reason);
+                if (success) {
+                    q.getSession().setAttribute("msg", "Return request submitted successfully for Order #" + orderId + ". Our team will review and update you soon.");
+                } else {
+                    q.getSession().setAttribute("error", "Return request could not be processed. Orders must be in DELIVERED state.");
+                }
+            }
+            p.sendRedirect(q.getContextPath() + "/order-detail?orderId=" + orderId);
+        } catch (Exception e) {
+            q.getSession().setAttribute("error", "Failed to submit return request: " + e.getMessage());
+            p.sendRedirect(q.getContextPath() + "/orders");
+        }
+    }
 }

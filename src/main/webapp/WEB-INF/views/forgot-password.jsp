@@ -28,6 +28,7 @@
         <% if (!"verify".equals(step)) { %>
             <!-- Step 1: Send OTP -->
             <form method="post" action="<%= ctx %>/forgot-password" style="margin-top:24px;">
+    <input type="hidden" name="_csrf" value="${csrfToken}" />
                 <input type="hidden" name="action" value="send-otp">
                 <div class="field">
                     <label>Account Email</label>
@@ -38,6 +39,7 @@
         <% } else { %>
             <!-- Step 2: Verify OTP & New Password -->
             <form method="post" action="<%= ctx %>/forgot-password" style="margin-top:24px;">
+    <input type="hidden" name="_csrf" value="${csrfToken}" />
                 <input type="hidden" name="action" value="reset-password">
                 <div class="field">
                     <label>6-Digit OTP Code</label>

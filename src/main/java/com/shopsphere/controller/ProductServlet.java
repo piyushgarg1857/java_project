@@ -54,6 +54,12 @@ public class ProductServlet extends HttpServlet {
         req.setAttribute("inStock", inStock);
         req.setAttribute("sort", sort == null ? "newest" : sort);
         req.setAttribute("page", page);
+        try {
+            com.shopsphere.model.User currentUser = (com.shopsphere.model.User) req.getSession().getAttribute("loggedInUser");
+            if (currentUser != null) {
+                req.setAttribute("wishlistIds", new com.shopsphere.dao.WishlistDAO().getWishlistProductIds(currentUser.getUserId()));
+            }
+        } catch (Exception ignored) {}
         req.getRequestDispatcher("/WEB-INF/views/products.jsp").forward(req, resp);
     }
 

@@ -61,6 +61,7 @@
 
         <!-- Coupon Form -->
         <form method="post" action="<%= ctx %>/checkout" class="coupon-form" style="margin-top:16px;">
+    <input type="hidden" name="_csrf" value="${csrfToken}" />
             <input name="couponCode" placeholder="Coupon code" value="<%= checkoutCoupon != null ? checkoutCoupon.getCode() : "" %>">
             <button type="submit" name="action" value="applyCoupon" class="btn secondary">Apply</button>
             <% if (checkoutCoupon != null) { %>
@@ -73,6 +74,7 @@
 
         <!-- Main Order Form -->
         <form id="checkoutForm" method="post" action="<%= ctx %>/checkout" style="margin-top:24px;">
+    <input type="hidden" name="_csrf" value="${csrfToken}" />
             <input type="hidden" name="razorpay_payment_id" id="rzpPaymentId" value="">
             <input type="hidden" name="addressId" id="selectedAddressId" value="">
             

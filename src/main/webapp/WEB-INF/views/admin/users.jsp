@@ -57,14 +57,14 @@
                     <td>
                         <div class="product-actions">
                             <form method="post" action="${pageContext.request.contextPath}/admin/users" class="inline">
-                                <input type="hidden" name="action" value="toggle">
+    <input type="hidden" name="_csrf" value="${csrfToken}" /><input type="hidden" name="action" value="toggle">
                                 <input type="hidden" name="userId" value="<%= u.getUserId() %>">
                                 <input type="hidden" name="status" value="<%= !u.isStatus() %>">
                                 <button class="btn secondary" type="submit"><%= u.isStatus() ? "Disable" : "Enable" %></button>
                             </form>
                             <% if ("CUSTOMER".equals(u.getRole())) { %>
                             <form method="post" action="${pageContext.request.contextPath}/admin/users" class="inline">
-                                <input type="hidden" name="action" value="role">
+    <input type="hidden" name="_csrf" value="${csrfToken}" /><input type="hidden" name="action" value="role">
                                 <input type="hidden" name="userId" value="<%= u.getUserId() %>">
                                 <input type="hidden" name="role" value="ADMIN">
                                 <button class="btn ghost" type="submit">Promote to Admin</button>

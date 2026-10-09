@@ -44,6 +44,43 @@ public class AdminProductServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
+            if ("bulk_import".equals(req.getParameter("action"))) {
+                String csvData = req.getParameter("csvData");
+                if (csvData == null || csvData.isBlank()) {
+                    throw new IllegalArgumentException("CSV data cannot be empty.");
+                }
+                String[] lines = csvData.split("\\r?\\n");
+                int count = 0;
+                for (String line : lines) {
+                    line = line.trim();
+                    if (line.isEmpty() || line.toLowerCase().startsWith("name,") || line.toLowerCase().startsWith("\"name\"")) {
+                        continue;
+                    }
+                    String[] cols = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                    if (cols.length >= 7) {
+                        Product bp = new Product();
+                        bp.setName(cols[0].replace("\"", "").trim());
+                        bp.setBrand(cols[1].replace("\"", "").trim());
+                        bp.setCategoryId(Integer.parseInt(cols[2].replace("\"", "").trim()));
+                        bp.setPrice(Double.parseDouble(cols[3].replace("\"", "").trim()));
+                        bp.setDiscount(Double.parseDouble(cols[4].replace("\"", "").trim()));
+                        bp.setStock(Integer.parseInt(cols[5].replace("\"", "").trim()));
+                        bp.setDescription(cols[6].replace("\"", "").trim());
+                        if (cols.length > 7) {
+                            bp.setImageUrl(cols[7].replace("\"", "").trim());
+                        } else {
+                            bp.setImageUrl("");
+                        }
+                        bp.setStatus(true);
+                        service.createProduct(bp);
+                        count++;
+                    }
+                }
+                req.getSession().setAttribute("msg", count + " products imported successfully via bulk CSV upload!");
+                resp.sendRedirect(req.getContextPath() + "/admin/products");
+                return;
+            }
+
             Product p = new Product();
             p.setCategoryId(Integer.parseInt(req.getParameter("categoryId")));
             p.setName(req.getParameter("name"));

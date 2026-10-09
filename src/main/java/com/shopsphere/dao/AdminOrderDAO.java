@@ -32,7 +32,7 @@ public class AdminOrderDAO {
     }
 
     public void updateStatus(int id, String status) throws SQLException {
-        if (!Set.of("PLACED", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED").contains(status)) {
+        if (!Set.of("PLACED", "PROCESSING", "SHIPPED", "DELIVERED", "RETURN_REQUESTED", "RETURNED", "CANCELLED", "REFUNDED").contains(status)) {
             throw new IllegalArgumentException("Invalid order status");
         }
 

@@ -28,7 +28,7 @@
         <% if (request.getAttribute("error") != null) { %><div class="chip danger" style="margin-top:12px;"><%= request.getAttribute("error") %></div><% } %>
         <% if (request.getAttribute("success") != null) { %><div class="chip success" style="margin-top:12px;"><%= request.getAttribute("success") %></div><% } %>
         <form method="post" action="${pageContext.request.contextPath}/password" style="margin-top:16px;">
-            <div class="field"><label>Current password</label><input type="password" name="currentPassword" required></div>
+    <input type="hidden" name="_csrf" value="${csrfToken}" /><div class="field"><label>Current password</label><input type="password" name="currentPassword" required></div>
             <div class="field"><label>New password</label><input type="password" name="newPassword" minlength="8" maxlength="128" required></div>
             <button type="submit" style="width:100%; margin-top:8px;">Update password</button>
         </form>

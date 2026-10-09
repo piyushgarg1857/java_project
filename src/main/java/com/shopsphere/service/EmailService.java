@@ -17,9 +17,9 @@ public class EmailService {
 
     private static final String SMTP_HOST = System.getenv().getOrDefault("SMTP_HOST", "smtp.gmail.com");
     private static final String SMTP_PORT = System.getenv().getOrDefault("SMTP_PORT", "587");
-    private static final String SMTP_USER = System.getenv().getOrDefault("SMTP_USER", "piyushgarg5931@gmail.com");
-    private static final String SMTP_PASS = System.getenv().getOrDefault("SMTP_PASS", "ifiopuydvafncojs");
-    private static final String FROM_EMAIL = System.getenv().getOrDefault("FROM_EMAIL", "piyushgarg5931@gmail.com");
+    private static final String SMTP_USER = System.getenv().getOrDefault("SMTP_USER", "");
+    private static final String SMTP_PASS = System.getenv().getOrDefault("SMTP_PASS", "");
+    private static final String FROM_EMAIL = System.getenv().getOrDefault("FROM_EMAIL", "noreply@shopsphere.com");
 
     public static void sendOrderReceiptAsync(String recipientEmail, String userName, int orderId, double totalAmount) {
         sendOrderReceiptAsync(recipientEmail, userName, orderId, totalAmount, "COD", "Saved Address", null);
@@ -45,6 +45,18 @@ public class EmailService {
                 sendEmail(recipientEmail, subject, htmlContent);
             } catch (Exception e) {
                 LOGGER.log(Level.WARNING, "Failed to dispatch order status update to " + recipientEmail, e);
+            }
+        });
+    }
+
+    public static void sendWelcomeEmailAsync(String recipientEmail, String userName) {
+        ASYNC_EXECUTOR.submit(() -> {
+            try {
+                String subject = "Welcome to ShopSphere — Your Premier Shopping Destination";
+                String htmlContent = buildWelcomeHtml(userName);
+                sendEmail(recipientEmail, subject, htmlContent);
+            } catch (Exception e) {
+                LOGGER.log(Level.WARNING, "Failed to dispatch welcome email to " + recipientEmail, e);
             }
         });
     }
@@ -217,6 +229,18 @@ public class EmailService {
              + "<p style='color: #a6a19a;'>Use the verification code below to reset your ShopSphere account password:</p>"
              + "<div style='font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #d8c8a8; background: #171717; padding: 15px; margin: 20px 0; border: 1px dashed #444; border-radius: 8px;'>" + otp + "</div>"
              + "<p style='color: #706b64; font-size: 11px;'>If you did not request a password reset, please ignore this email.</p>"
+             + "</div></body></html>";
+    }
+
+    private static String buildWelcomeHtml(String userName) {
+        return "<html><body style='font-family: Arial, sans-serif; background: #080808; color: #f3efe7; padding: 30px; margin: 0;'>"
+             + "<div style='max-width: 550px; margin: 0 auto; background: #121212; border: 1px solid #222; border-radius: 12px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center;'>"
+             + "<h1 style='font-family: serif; letter-spacing: 3px; font-size: 24px; color: #d8c8a8; margin: 0 0 15px; text-transform: uppercase;'>SHOPSPHERE</h1>"
+             + "<div style='font-size: 40px; margin: 15px 0;'>✨</div>"
+             + "<h2 style='color: #f3efe7; margin: 0 0 10px;'>Welcome to the World of Luxury Shopping</h2>"
+             + "<p style='font-size: 14px; color: #a6a19a; line-height: 1.6; margin-bottom: 25px;'>Hello <strong>" + (userName != null && !userName.isBlank() ? userName : "Valued Member") + "</strong>, thank you for joining ShopSphere. Explore our curated collections of premium audio, footwear, watches, and designer lifestyle products.</p>"
+             + "<a href='https://shopsphere-online.azurewebsites.net/products' style='display: inline-block; background: #d8c8a8; color: #080808; text-decoration: none; padding: 14px 28px; font-size: 12px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; border-radius: 4px;'>Start Exploring →</a>"
+             + "<p style='color: #666; font-size: 11px; text-align: center; margin-top: 30px;'>© 2026 ShopSphere E-Commerce. All rights reserved.</p>"
              + "</div></body></html>";
     }
 }

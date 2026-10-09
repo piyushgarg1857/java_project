@@ -34,6 +34,12 @@ public class ProductDetailServlet extends HttpServlet {
             } catch (Exception ex) {
                 q.setAttribute("reviews", Collections.emptyList());
             }
+            try {
+                com.shopsphere.model.User currentUser = (com.shopsphere.model.User) q.getSession().getAttribute("loggedInUser");
+                if (currentUser != null) {
+                    q.setAttribute("isWishlisted", new com.shopsphere.dao.WishlistDAO().isWishlisted(currentUser.getUserId(), id));
+                }
+            } catch (Exception ignored) {}
             q.getRequestDispatcher("/WEB-INF/views/product-detail.jsp").forward(q, p);
         } catch (NumberFormatException e) {
             p.sendRedirect(q.getContextPath() + "/products");

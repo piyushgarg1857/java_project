@@ -79,6 +79,7 @@
     <% } else { %>
         <div class="grid">
         <% 
+            java.util.Set<Integer> wishIds = (java.util.Set<Integer>) request.getAttribute("wishlistIds");
             String[] images = {
                 "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=900&q=85",
                 "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=85",
@@ -88,6 +89,7 @@
             int i = 0;
             for (Product p : products) {
                 String image = (p.getImageUrl() != null && !p.getImageUrl().trim().isEmpty()) ? p.getImageUrl() : images[i++ % images.length];
+                boolean isItemWishlisted = (wishIds != null && wishIds.contains(p.getProductId()));
         %>
             <article class="product-card">
                 <a class="product-image" href="<%= ctx %>/product?id=<%= p.getProductId() %>">
@@ -98,21 +100,34 @@
                     <span class="chip"><%= p.getBrand() != null ? p.getBrand() : "ShopSphere" %></span>
                     <a class="product-title" href="<%= ctx %>/product?id=<%= p.getProductId() %>"><%= p.getName() %></a>
                     <p class="muted"><%= p.getDescription() != null && p.getDescription().length() > 85 ? p.getDescription().substring(0, 85) + "…" : (p.getDescription() == null ? "" : p.getDescription()) %></p>
-                    <div style="display:flex;justify-content:space-between;align-items:center">
+                    <div style="display:flex;justify-content:space-between;align-items:center; margin: 6px 0;">
                         <span class="price">₹<%= String.format("%.2f", p.getPrice()) %></span>
-                        <span class="chip <%= p.getStock() > 0 ? "success" : "danger" %>"><%= p.getStock() > 0 ? "In stock" : "Out of stock" %></span>
+                        <% if (p.getStock() <= 5 && p.getStock() > 0) { %>
+                            <span class="chip danger" style="font-weight:600;">Only <%= p.getStock() %> left!</span>
+                        <% } else if (p.getStock() > 0) { %>
+                            <span class="chip success">In stock</span>
+                        <% } else { %>
+                            <span class="chip danger">Out of stock</span>
+                        <% } %>
                     </div>
-                    <div class="product-actions">
+                    <div class="product-actions" style="display:flex; gap:8px;">
                         <% if (p.getStock() > 0) { %>
-                        <form method="post" action="<%= ctx %>/cart">
+                        <form method="post" action="<%= ctx %>/cart" style="flex:1;">
+                            <input type="hidden" name="_csrf" value="${csrfToken}" />
                             <input type="hidden" name="productId" value="<%= p.getProductId() %>">
                             <input type="hidden" name="quantity" value="1">
-                            <button type="submit">Add to bag</button>
+                            <button type="submit" style="width:100%;">Add to bag</button>
                         </form>
                         <% } %>
                         <form method="post" action="<%= ctx %>/wishlist">
+                            <input type="hidden" name="_csrf" value="${csrfToken}" />
                             <input type="hidden" name="productId" value="<%= p.getProductId() %>">
-                            <button class="btn ghost" type="submit">♡</button>
+                            <% if (isItemWishlisted) { %>
+                                <input type="hidden" name="action" value="remove">
+                                <button class="btn secondary" type="submit" title="Remove from wishlist">❤️</button>
+                            <% } else { %>
+                                <button class="btn ghost" type="submit" title="Save to wishlist">🤍</button>
+                            <% } %>
                         </form>
                     </div>
                 </div>
@@ -142,4 +157,4 @@
 <script src="<%= ctx %>/assets/js/app.js"></script>
 </body>
 </html>
-
+

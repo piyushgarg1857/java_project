@@ -4,7 +4,7 @@
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_1.xsd"
          version="6.1">
     <display-name>ShopSphere</display-name>
-    <session-config><session-timeout>30</session-timeout><cookie-config><http-only>true</http-only><secure>false</secure></cookie-config><tracking-mode>COOKIE</tracking-mode></session-config>
+    <session-config><session-timeout>30</session-timeout><cookie-config><http-only>true</http-only><secure>true</secure></cookie-config><tracking-mode>COOKIE</tracking-mode></session-config>
 
     <error-page>
         <error-code>400</error-code>

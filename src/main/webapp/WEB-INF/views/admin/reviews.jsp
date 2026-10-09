@@ -53,7 +53,7 @@
                     <td class="muted"><%= r.get("createdAt") %></td>
                     <td>
                         <form method="post" action="${pageContext.request.contextPath}/admin/reviews">
-                            <input type="hidden" name="reviewId" value="<%= r.get("reviewId") %>">
+    <input type="hidden" name="_csrf" value="${csrfToken}" /><input type="hidden" name="reviewId" value="<%= r.get("reviewId") %>">
                             <button type="submit" class="btn danger" onclick="return confirm('Delete this review?')">Delete</button>
                         </form>
                     </td>

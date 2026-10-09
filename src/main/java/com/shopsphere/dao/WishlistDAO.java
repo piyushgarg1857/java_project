@@ -51,4 +51,33 @@ public class WishlistDAO {
         }
         return products;
     }
+
+    public boolean isWishlisted(int userId, int productId) {
+        String q = "SELECT 1 FROM wishlist WHERE user_id=? AND product_id=?";
+        try (Connection c = DBConnection.getConnection();
+             PreparedStatement s = c.prepareStatement(q)) {
+            s.setInt(1, userId);
+            s.setInt(2, productId);
+            try (ResultSet rs = s.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public Set<Integer> getWishlistProductIds(int userId) {
+        Set<Integer> ids = new HashSet<>();
+        String q = "SELECT product_id FROM wishlist WHERE user_id=?";
+        try (Connection c = DBConnection.getConnection();
+             PreparedStatement s = c.prepareStatement(q)) {
+            s.setInt(1, userId);
+            try (ResultSet rs = s.executeQuery()) {
+                while (rs.next()) {
+                    ids.add(rs.getInt(1));
+                }
+            }
+        } catch (Exception ignored) {}
+        return ids;
+    }
 }

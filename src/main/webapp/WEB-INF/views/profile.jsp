@@ -39,7 +39,7 @@
             <% if (request.getAttribute("error") != null) { %><div class="chip danger" style="margin-top:12px;"><%= request.getAttribute("error") %></div><% } %>
             <% if (request.getAttribute("success") != null) { %><div class="chip success" style="margin-top:12px;"><%= request.getAttribute("success") %></div><% } %>
             <form method="post" style="margin-top:16px;">
-                <div class="field"><label>Full Name</label><input name="name" value="<%= u != null ? u.getName() : "" %>" required></div>
+    <input type="hidden" name="_csrf" value="${csrfToken}" /><div class="field"><label>Full Name</label><input name="name" value="<%= u != null ? u.getName() : "" %>" required></div>
                 <div class="field"><label>Email Address</label><input value="<%= u != null ? u.getEmail() : "" %>" disabled></div>
                 <div class="field"><label>Mobile Number</label><input name="mobile" value="<%= u != null && u.getMobile() != null ? u.getMobile() : "" %>"></div>
                 <button type="submit" style="width:100%; margin-top:8px;">Save changes</button>

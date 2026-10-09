@@ -43,6 +43,8 @@
         <div class="auth-divider"><span>OR REGISTER WITH EMAIL</span></div>
 
         <form method="post" action="<%= ctx %>/register">
+    <input type="hidden" name="_csrf" value="${csrfToken}" />
+            
             <div class="field">
                 <label>Full name</label>
                 <input name="name" required placeholder="John Doe">

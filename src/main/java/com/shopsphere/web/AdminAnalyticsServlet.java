@@ -16,10 +16,16 @@ public class AdminAnalyticsServlet extends HttpServlet {
         try {
             q.setAttribute("summary", dao.summary());
             q.setAttribute("daily", dao.recentOrders());
+            q.setAttribute("statusDistribution", dao.orderStatusDistribution());
+            q.setAttribute("topProducts", dao.topSellingProducts());
+            q.setAttribute("lowStock", dao.lowStockProducts(5));
         } catch (Exception e) {
             e.printStackTrace();
             q.setAttribute("summary", Collections.emptyMap());
             q.setAttribute("daily", Collections.emptyList());
+            q.setAttribute("statusDistribution", Collections.emptyMap());
+            q.setAttribute("topProducts", Collections.emptyList());
+            q.setAttribute("lowStock", Collections.emptyList());
             q.setAttribute("error", "Failed to load analytics: " + e.getMessage());
         }
         q.getRequestDispatcher("/WEB-INF/views/admin/analytics.jsp").forward(q, p);

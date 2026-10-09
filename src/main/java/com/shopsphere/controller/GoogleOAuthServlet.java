@@ -213,9 +213,15 @@ public class GoogleOAuthServlet extends HttpServlet {
                 userDao.create(user);
                 user = userDao.findByEmail(email);
 
-                com.shopsphere.service.EmailService.sendOrderReceiptAsync(email, name, 0, 0.0);
+                com.shopsphere.service.EmailService.sendWelcomeEmailAsync(email, name);
+            } else if (!user.isStatus()) {
+                req.setAttribute("error", "Your account has been deactivated by an administrator. Please contact support.");
+                req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
+                return;
             }
 
+            HttpSession oldSession = req.getSession(false);
+            if (oldSession != null) oldSession.invalidate();
             HttpSession session = req.getSession(true);
             session.setAttribute("loggedInUser", user);
             LOGGER.info("[GOOGLE OAUTH VERIFIED SUCCESS] User logged in: " + email);

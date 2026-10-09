@@ -87,5 +87,15 @@ public class OrderDetailDAO {
         }
         return out;
     }
+
+    public boolean requestReturn(int userId, int orderId, String reason) throws SQLException {
+        String q = "UPDATE orders SET order_status='RETURN_REQUESTED' WHERE user_id=? AND order_id=? AND order_status='DELIVERED'";
+        try (Connection c = DBConnection.getConnection();
+             PreparedStatement s = c.prepareStatement(q)) {
+            s.setInt(1, userId);
+            s.setInt(2, orderId);
+            return s.executeUpdate() > 0;
+        }
+    }
 }
 

@@ -63,7 +63,7 @@ public class AdminUserDAO {
     }
 
     private boolean isLastActiveAdmin(int id) throws SQLException {
-        String q = "SELECT COUNT(*) FROM users WHERE role='ADMIN' AND status=TRUE AND user_id<>";
+        String q = "SELECT COUNT(*) FROM users WHERE role='ADMIN' AND status=TRUE AND user_id <> ?";
         try (Connection c = DBConnection.getConnection(); PreparedStatement s = c.prepareStatement(q)) {
             s.setInt(1, id);
             try (ResultSet r = s.executeQuery()) {

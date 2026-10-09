@@ -147,6 +147,38 @@
                     <strong style="color:var(--accent)">₹<%= order != null ? order.get("totalAmount") : "0.00" %></strong>
                 </div>
             </div>
+
+            <!-- Return & Refund Request Section (Feature #3) -->
+            <% if ("DELIVERED".equalsIgnoreCase(status)) { %>
+            <div style="margin-top: 24px; padding-top: 16px; border-top: 1px dashed #333;">
+                <h4 style="font-size: 13px; color: #d8c8a8; margin-bottom: 8px;">Need to Return or Refund?</h4>
+                <p class="muted" style="font-size: 12px; margin-bottom: 12px;">You are eligible for our 7-day hassle-free return policy.</p>
+                <form method="post" action="<%= ctx %>/order-detail">
+                    <input type="hidden" name="_csrf" value="${csrfToken}" />
+                    <input type="hidden" name="action" value="return_request">
+                    <input type="hidden" name="orderId" value="<%= order != null ? order.get("orderId") : "" %>">
+                    <div style="margin-bottom: 10px;">
+                        <label style="font-size: 11px; color:#aaa; display:block; margin-bottom:4px;">Reason for Return:</label>
+                        <select name="reason" required style="width:100%; padding:8px; background:#181818; border:1px solid #333; color:#fff; border-radius:4px; font-size:12px;">
+                            <option value="Damaged/Defective item">Damaged or defective item</option>
+                            <option value="Wrong product received">Wrong product received</option>
+                            <option value="Item not as described">Item not as described</option>
+                            <option value="Quality issue">Quality issue</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn secondary" style="width:100%; font-size:12px; padding:8px;">Request Return / Refund</button>
+                </form>
+            </div>
+            <% } else if ("RETURN_REQUESTED".equalsIgnoreCase(status)) { %>
+            <div style="margin-top: 24px; padding: 14px; background: rgba(216, 200, 168, 0.1); border: 1px solid #d8c8a8; border-radius: 8px; font-size: 12px; color: #d8c8a8;">
+                <strong>🔄 Return Request Pending:</strong> Our team is reviewing your request. You will receive an email once approved.
+            </div>
+            <% } else if ("RETURNED".equalsIgnoreCase(status) || "REFUNDED".equalsIgnoreCase(status)) { %>
+            <div style="margin-top: 24px; padding: 14px; background: rgba(40, 167, 69, 0.1); border: 1px solid #28a745; border-radius: 8px; font-size: 12px; color: #28a745;">
+                <strong>✓ Return / Refund Approved:</strong> Return accepted and refund processed.
+            </div>
+            <% } %>
         </div>
     </div>
 </main>

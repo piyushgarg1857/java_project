@@ -113,9 +113,11 @@
                 </div>
                 <div class="product-actions">
                     <% if (p.getStock() > 0) { %>
-                    <form method="post" action="${pageContext.request.contextPath}/cart"><input type="hidden" name="productId" value="<%= p.getProductId() %>"><input type="hidden" name="quantity" value="1"><button type="submit">Add to bag</button></form>
+                    <form method="post" action="${pageContext.request.contextPath}/cart">
+    <input type="hidden" name="_csrf" value="${csrfToken}" /><input type="hidden" name="productId" value="<%= p.getProductId() %>"><input type="hidden" name="quantity" value="1"><button type="submit">Add to bag</button></form>
                     <% } %>
-                    <form method="post" action="${pageContext.request.contextPath}/wishlist"><input type="hidden" name="productId" value="<%= p.getProductId() %>"><button class="btn ghost" type="submit" title="Add to wishlist">♡</button></form>
+                    <form method="post" action="${pageContext.request.contextPath}/wishlist">
+    <input type="hidden" name="_csrf" value="${csrfToken}" /><input type="hidden" name="productId" value="<%= p.getProductId() %>"><button class="btn ghost" type="submit" title="Add to wishlist">♡</button></form>
                 </div>
             </div>
         </article>
